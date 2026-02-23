@@ -1,5 +1,5 @@
 ---
-title: "IDRIS Scoring App"
+title: "Danki Impact Scoring App"
 format:
   html:
     page-layout: full
@@ -15,25 +15,28 @@ execute:
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<title>Danki Impact Scoring App</title>
+<!-- ... rest of your file continues here ... -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --mint:#33FFA2;--magenta:#FF33FF;--grey:#737373;
-  --bg:#F7F7F5;--surface:#FFFFFF;--border:#E5E5E5;--border-strong:#D0D0D0;
-  --ink:#1A1A1A;--ink-2:#3D3D3D;--ink-3:#737373;
-  --mint-d:#00CC7A;--mag-d:#CC00CC;
-  --dg:#1a6b3a;--green:#33AA66;--amber:#E8A020;--red:#CC3333;
-  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --accent:#00B4D8;--social:#E040FB;--grey:#737373;
+  --bg:#F8F9FA;--surface:#FFFFFF;--border:#E5E5E5;--border-strong:#D0D0D0;
+  --ink:#0D1B2A;--ink-2:#1B2A3D;--ink-3:#6C757D;
+  --accent-d:#0096B7;--social-d:#CC00CC;
+  --dg:#00C853;--green:#4CAF50;--amber:#FFB300;--red:#FF5252;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.06);
 }
 body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
 
 /* ── TOP BAR ── */
 .top-bar{border-bottom:1px solid var(--border);padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:var(--surface);position:sticky;top:0;z-index:100}
 .top-bar-left{display:flex;align-items:center;gap:.75rem}
-.top-logo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;background:linear-gradient(90deg,var(--mint),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.top-logo{font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.top-logo span{color:var(--accent)}
 .top-divider{width:1px;height:18px;background:var(--border-strong)}
 .top-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 .sdg-strip{display:flex;align-items:center;gap:.4rem}
@@ -45,8 +48,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 /* ── HEADER ── */
 .app-header{text-align:center;padding:2.5rem 0 3rem;animation:fadeDown .5s ease both}
 .header-eyebrow{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1rem;display:block}
-.app-header h1{font-family:'Fraunces',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;letter-spacing:-.02em;line-height:1.05;color:var(--ink);margin-bottom:.9rem}
-.app-header h1 em{font-style:italic;font-weight:300;background:linear-gradient(90deg,var(--mint),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.app-header h1{font-family:'Inter',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;color:var(--ink);margin-bottom:.9rem}
+.app-header h1 em{font-style:normal;font-weight:400;color:var(--accent)}
 .app-header p{color:var(--ink-3);font-size:.9rem;max-width:540px;margin:0 auto;line-height:1.75}
 
 /* ── GRID ── */
@@ -57,8 +60,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 
 /* ── CARDS ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;box-shadow:var(--shadow);position:relative;overflow:hidden;animation:fadeUp .5s ease both}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--mint),transparent)}
-.card.card-mag::before{background:linear-gradient(90deg,var(--magenta),transparent)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.card.card-social::before{background:var(--social)}
 .card.card-full{grid-column:1/-1}
 .card-title{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1.4rem}
 .card-score-hero{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem}
@@ -68,13 +71,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 .form-row.full{grid-template-columns:1fr}
 .field label{display:block;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.35rem}
 .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border-strong);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:.85rem;padding:.52rem .8rem;transition:border-color .15s;appearance:none}
-.field input:focus,.field select:focus{outline:none;border-color:var(--mint-d);box-shadow:0 0 0 3px rgba(51,255,162,.1)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent-d);box-shadow:0 0 0 3px rgba(0,180,216,.1)}
 .field select option{background:var(--surface)}
-.field input[type="range"]{padding:0;height:3px;background:var(--border);border:none;cursor:pointer;accent-color:var(--mint-d);border-radius:100px}
+.field input[type="range"]{padding:0;height:3px;background:var(--border);border:none;cursor:pointer;accent-color:var(--accent-d);border-radius:100px}
 .range-row{display:flex;align-items:center;gap:.75rem}
 .range-val{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ink);min-width:3.5rem;text-align:right;font-weight:500}
 .sep{height:1px;background:var(--border);margin:1.25rem 0}
-.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint-d);margin-bottom:.75rem;display:block}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-d);margin-bottom:.75rem;display:block}
 
 /* ── CALC BUTTON ── */
 .calc-btn{width:100%;padding:.875rem;margin-top:1.25rem;background:var(--ink);border:none;border-radius:8px;color:white;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:all .2s}
@@ -82,15 +85,15 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 
 /* ── SCORE HERO ── */
 .score-hero-wrap{text-align:center;padding:1.5rem 0 1rem}
-.score-number{font-family:'Fraunces',serif;font-size:5rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.score-number{font-family:'Inter',sans-serif;font-size:4.5rem;font-weight:700;line-height:1;letter-spacing:-.03em}
 .score-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:.3rem}
 .band-pill-lg{display:inline-block;padding:.4rem 1.2rem;border-radius:100px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:600;letter-spacing:.08em;margin-top:.75rem}
 .band-dg{background:var(--dg);color:white}
 .band-g {background:var(--green);color:white}
 .band-a {background:var(--amber);color:white}
-.band-r {background:var(--red);  color:white}
-.veto-banner{background:rgba(255,51,255,.06);border:1px solid rgba(255,51,255,.3);border-radius:8px;padding:.75rem 1rem;margin-top:1rem;font-size:.78rem;color:var(--mag-d);line-height:1.6}
-.veto-banner strong{color:var(--magenta)}
+.band-r {background:var(--red);color:white}
+.veto-banner{background:rgba(224,64,251,.06);border:1px solid rgba(224,64,251,.3);border-radius:8px;padding:.75rem 1rem;margin-top:1rem;font-size:.78rem;color:var(--social-d);line-height:1.6}
+.veto-banner strong{color:var(--social)}
 
 /* ── RADAR CHART ── */
 #radarCanvas{display:block;margin:0 auto;max-width:100%}
@@ -108,16 +111,16 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 @media(max-width:500px){.reg-grid{grid-template-columns:1fr}}
 .reg-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem}
 .reg-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.35rem}
-.reg-value{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
+.reg-value{font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
 .reg-sub{font-size:.72rem;color:var(--ink-3);margin-top:.2rem;line-height:1.5}
 .status-pass{color:var(--dg);font-weight:600}
 .status-fail{color:var(--red);font-weight:600}
 .status-med {color:var(--amber);font-weight:600}
 .tcfd-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem}
 .tcfd-pill{font-family:'DM Mono',monospace;font-size:.62rem;padding:.2rem .55rem;border-radius:4px}
-.tcfd-low {background:rgba(26,107,58,.1); color:var(--dg)}
-.tcfd-med {background:rgba(232,160,32,.1);color:#8a5500}
-.tcfd-high{background:rgba(204,51,51,.1); color:var(--red)}
+.tcfd-low {background:rgba(0,200,83,.1);color:var(--dg)}
+.tcfd-med {background:rgba(255,179,0,.1);color:#8a5500}
+.tcfd-high{background:rgba(255,82,82,.1);color:var(--red)}
 
 /* ── PAI TABLE ── */
 .pai-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
@@ -133,18 +136,18 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 /* ── FLAGS ── */
 .flags-col{display:flex;flex-direction:column;gap:.5rem}
 .flag-item{padding:.65rem .9rem;border-radius:8px;font-size:.78rem;line-height:1.6}
-.flag-warn{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);color:#7a4f00}
+.flag-warn{background:rgba(255,179,0,.08);border:1px solid rgba(255,179,0,.3);color:#7a4f00}
 .flag-warn strong{color:var(--amber)}
-.flag-strength{background:rgba(51,170,102,.08);border:1px solid rgba(51,170,102,.3);color:#1a4d2e}
+.flag-strength{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.3);color:#1a4d2e}
 .flag-strength strong{color:var(--dg)}
 
 /* ── SFDR RECOMMENDATION ── */
 .sfdr-rec{border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem;border:1px solid var(--border)}
-.sfdr-rec.art9{background:rgba(26,107,58,.06);border-left:4px solid var(--dg)}
-.sfdr-rec.art8{background:rgba(51,170,102,.06);border-left:4px solid var(--green)}
+.sfdr-rec.art9{background:rgba(0,200,83,.06);border-left:4px solid var(--dg)}
+.sfdr-rec.art8{background:rgba(76,175,80,.06);border-left:4px solid var(--green)}
 .sfdr-rec.art6{background:rgba(115,115,115,.06);border-left:4px solid var(--grey)}
 .sfdr-art-num{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.3rem}
-.sfdr-art-name{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
+.sfdr-art-name{font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
 .sfdr-art-desc{font-size:.8rem;color:var(--ink-3);margin-top:.35rem;line-height:1.6}
 
 /* ── PDF BUTTON ── */
@@ -170,9 +173,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 <!-- TOP BAR -->
 <nav class="top-bar">
   <div class="top-bar-left">
-    <span class="top-logo">IDRIS</span>
+    <span class="top-logo">DANKI <span>IMPACT</span></span>
     <div class="top-divider"></div>
-    <span class="top-label">Impact Due Diligence Scoring &middot; v1.0</span>
+    <span class="top-label">Impact Scoring &middot; v1.0</span>
   </div>
   <div class="sdg-strip">
     <svg class="sdg-ico" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">2</text></svg>
@@ -187,9 +190,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 
   <!-- HEADER -->
   <header class="app-header">
-    <span class="header-eyebrow">Impact &amp; Due Diligence Risk Intelligence Scoring</span>
+    <span class="header-eyebrow">Danki Impact Scoring</span>
     <h1>Project Impact<br/><em>Assessment</em></h1>
-    <p>Enter project parameters to receive a composite IDRIS score, regulatory
+    <p>Enter project parameters to receive a composite Danki score, regulatory
     framework classification and full impact dimension breakdown.</p>
   </header>
 
@@ -290,7 +293,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
     </div>
 
     <!-- IMPACT FACTORS -->
-    <div class="card card-mag">
+    <div class="card card-social">
       <div class="card-title">02 &mdash; Impact Factors (optional overrides)</div>
       <span class="section-label">Environmental</span>
       <div class="form-row full"><div class="field"><label>GHG intensity override (0=very low, 1=very high)</label>
@@ -318,10 +321,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
       </div></div>
       <div class="sep"></div>
       <div style="font-size:.75rem;color:var(--ink-3);line-height:1.7;background:var(--bg);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
-        Leave at default to use sector and country benchmarks from the IDRIS reference database.
+        Leave at default to use sector and country benchmarks from the Danki reference database.
         Override only when you have audited project-specific data.
       </div>
-      <button class="calc-btn" onclick="calculate()">Run IDRIS Scoring</button>
+      <button class="calc-btn" onclick="calculate()">Run Danki Scoring</button>
     </div>
   </div>
 
@@ -333,7 +336,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 
       <!-- COMPOSITE SCORE -->
       <div class="card" id="scoreCard">
-        <div class="card-title">03 &mdash; IDRIS Composite Score</div>
+        <div class="card-title">03 &mdash; Danki Composite Score</div>
         <div class="score-hero-wrap">
           <div class="score-number" id="scoreNumber" style="color:var(--dg)">—</div>
           <div class="score-label">out of 100</div>
@@ -353,7 +356,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
         <!-- MiFID -->
         <div style="display:flex;gap:.6rem;align-items:center;margin-top:.5rem">
           <span style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">MiFID II Suitability:</span>
-          <span id="mifidScore" style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)">—</span>
+          <span id="mifidScore" style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:600;color:var(--ink)">—</span>
           <span style="font-size:.72rem;color:var(--ink-3)">/10</span>
         </div>
         <div id="mifidProfile" style="font-size:.75rem;color:var(--ink-3);margin-top:.2rem;line-height:1.5"></div>
@@ -381,7 +384,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
       </div>
 
       <!-- PAI DASHBOARD -->
-      <div class="card card-mag">
+      <div class="card card-social">
         <div class="card-title">06 &mdash; SFDR PAI Indicators</div>
         <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--ink-3);margin-bottom:.8rem;letter-spacing:.06em">
           PAI Aggregate Score: <span id="paiScoreVal" style="color:var(--ink);font-weight:500">—</span>/100
@@ -409,7 +412,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webki
 
   <!-- FOOTER -->
   <footer class="app-footer">
-    <div class="footer-left">IDRIS v1.0 &middot; Danki Studio &middot; Nambona Adeline YANGUERE</div>
+    <div class="footer-left">Danki Impact Scoring v1.0 &middot; Danki Studio &middot; Nambona YANGUERE</div>
     <div class="footer-sdgs">
       <svg class="sdg-ico" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">2</text></svg>
       <svg class="sdg-ico" viewBox="0 0 100 100"><rect width="100" height="100" fill="#26BDE2"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">6</text></svg>
@@ -476,7 +479,7 @@ function scoreGovernance(cpi,euMember,assetCls){let b=(cpi/100)*65+(euMember?20:
 function scorePollution(ghg,taxElig){return clamp((1-ghg)*75+(taxElig?20:0));}
 function scoreInnovation(sector,sf,hdi){return clamp(40+(INNOV_SECT.has(sector)?30:0)+sf*20+hdi*10);}
 
-function computeIDRIS(dims){return Object.keys(WEIGHTS).reduce((s,k)=>s+WEIGHTS[k]*dims[k],0);}
+function computeDanki(dims){return Object.keys(WEIGHTS).reduce((s,k)=>s+WEIGHTS[k]*dims[k],0);}
 
 function calcPAI(ghg,gender,cpi,vuln,gov){
   const s=[(1-ghg)*100,(1-ghg*.8)*100,(1-vuln*.5)*100,(1-ghg*.4)*100,(1-ghg*.6)*100,
@@ -484,9 +487,9 @@ function calcPAI(ghg,gender,cpi,vuln,gov){
   return Math.round(s.reduce((a,b)=>a+b,0)/s.length*10)/10;
 }
 
-function calcSFDR(idris,taxAligned,pai,gov){
-  if(taxAligned&&idris>=72&&pai>=70)return"Article 9";
-  if(idris>=50&&pai>=50)return"Article 8";
+function calcSFDR(danki,taxAligned,pai,gov){
+  if(taxAligned&&danki>=72&&pai>=70)return"Article 9";
+  if(danki>=50&&pai>=50)return"Article 8";
   return"Article 6";
 }
 
@@ -496,8 +499,8 @@ function calcTCFD(vuln,ghg,sector){
   return[phys,trans];
 }
 
-function calcMiFID(idris,sfdr,phys,trans){
-  let b=idris/10;
+function calcMiFID(danki,sfdr,phys,trans){
+  let b=danki/10;
   if(sfdr==="Article 9")b=Math.min(b+1.5,10);
   else if(sfdr==="Article 8")b=Math.min(b+.5,10);
   if(phys==="High"||trans==="High")b=Math.max(b-1,0);
@@ -506,10 +509,10 @@ function calcMiFID(idris,sfdr,phys,trans){
   return[b,p];
 }
 
-function calcTaxonomy(sector,ghg,vuln,idris){
+function calcTaxonomy(sector,ghg,vuln,danki){
   const[elig]=SECTOR[sector]||[false];
   if(!elig)return[false,false,false,0];
-  const sc=clamp((1-ghg)*.6+(idris/100)*.4,0,1);
+  const sc=clamp((1-ghg)*.6+(danki/100)*.4,0,1);
   const dnsh=(ghg<.50)&&(vuln<.70);
   const aligned=dnsh&&(sc>.40);
   return[true,aligned,dnsh,Math.round(sc*100*10)/10];
@@ -547,24 +550,24 @@ function calculate(){
     innovation: scoreInnovation(sector,sf,hdi),
   };
 
-  const rawIDRIS = computeIDRIS(dims);
+  const rawDanki = computeDanki(dims);
   const vetoTriggered = dims.gender<VETO_THRESHOLD||dims.social<VETO_THRESHOLD;
   let bandStr;
-  if(rawIDRIS>=75)bandStr="Dark Green";
-  else if(rawIDRIS>=58)bandStr="Green";
-  else if(rawIDRIS>=40)bandStr="Amber";
+  if(rawDanki>=75)bandStr="Dark Green";
+  else if(rawDanki>=58)bandStr="Green";
+  else if(rawDanki>=40)bandStr="Amber";
   else bandStr="Red";
   if(vetoTriggered&&(bandStr==="Dark Green"||bandStr==="Green"))bandStr="Amber";
 
-  const[taxE,taxA,dnsh,sc]=calcTaxonomy(sector,ghg,vuln,rawIDRIS);
+  const[taxE,taxA,dnsh,sc]=calcTaxonomy(sector,ghg,vuln,rawDanki);
   const pai=calcPAI(ghg,gf,cpi,vuln,dims.governance);
-  const sfdr=calcSFDR(rawIDRIS,taxA,pai,dims.governance);
+  const sfdr=calcSFDR(rawDanki,taxA,pai,dims.governance);
   const[phys,trans]=calcTCFD(vuln,ghg,sector);
-  const[ms,mp]=calcMiFID(rawIDRIS,sfdr,phys,trans);
+  const[ms,mp]=calcMiFID(rawDanki,sfdr,phys,trans);
 
   lastResult={
     projName,country,sector,ac,eur,
-    idris:Math.round(rawIDRIS*10)/10,band:bandStr,dims,
+    danki:Math.round(rawDanki*10)/10,band:bandStr,dims,
     veto:vetoTriggered,pai,sfdr,
     taxElig:taxE,taxAlign:taxA,dnsh,sc,
     phys,trans,ms,mp,
@@ -575,15 +578,15 @@ function calculate(){
 }
 
 // ── RENDER ────────────────────────────────────────────────────────
-const BAND_COLORS={"Dark Green":"#1a6b3a","Green":"#33AA66","Amber":"#E8A020","Red":"#CC3333"};
+const BAND_COLORS={"Dark Green":"#00C853","Green":"#4CAF50","Amber":"#FFB300","Red":"#FF5252"};
 const DIM_ORDER=["gender","social","governance","climate","pollution","water","territory","innovation"];
 const DIM_LABELS={"gender":"Gender Equity","social":"Social Mobility","governance":"Governance","climate":"Climate","pollution":"Pollution","water":"Water","territory":"Territory","innovation":"Innovation"};
-const DIM_COLORS={"gender":"#FF33FF","social":"#CC00CC","governance":"#33FFA2","climate":"#33AA66","pollution":"#00CC7A","water":"#26BDE2","territory":"#DDA63A","innovation":"#9B59B6"};
+const DIM_COLORS={"gender":"#E040FB","social":"#CC00CC","governance":"#AB47BC","climate":"#00B4D8","pollution":"#0096B7","water":"#26BDE2","territory":"#FFB300","innovation":"#6C757D"};
 
 function renderResults(r){
   // Score hero
   const sn=document.getElementById('scoreNumber');
-  sn.textContent=r.idris.toFixed(1);
+  sn.textContent=r.danki.toFixed(1);
   sn.style.color=BAND_COLORS[r.band];
   const bp=document.getElementById('bandPill');
   bp.textContent=r.band;
@@ -595,7 +598,7 @@ function renderResults(r){
     let msg='';
     if(r.dims.gender<VETO_THRESHOLD)msg+=`Gender equity score (${r.dims.gender.toFixed(0)}/100) is below the ${VETO_THRESHOLD}-point floor. `;
     if(r.dims.social<VETO_THRESHOLD)msg+=`Social mobility score (${r.dims.social.toFixed(0)}/100) is below the ${VETO_THRESHOLD}-point floor. `;
-    msg+='Band capped at Amber — social foundation failure is disqualifying under IDRIS methodology.';
+    msg+='Band capped at Amber — social foundation failure is disqualifying under Danki methodology.';
     document.getElementById('vetoText').textContent=msg;
   } else {
     vb.style.display='none';
@@ -619,7 +622,7 @@ function renderResults(r){
   bars.innerHTML='';
   DIM_ORDER.forEach(k=>{
     const v=r.dims[k];
-    const color=v<30?'#CC3333':(v<50?'#E8A020':DIM_COLORS[k]);
+    const color=v<30?'#FF5252':(v<50?'#FFB300':DIM_COLORS[k]);
     bars.innerHTML+=`<div class="dim-row">
       <span class="dim-name">${DIM_LABELS[k]}</span>
       <div class="dim-track"><div class="dim-fill" style="width:${v}%;background:${color}"></div></div>
@@ -662,7 +665,7 @@ function renderResults(r){
     <div class="reg-item">
       <div class="reg-label">PRIIPs / MiFID II</div>
       <div class="reg-value">${r.ms.toFixed(1)}/10</div>
-      <div class="reg-sub">${r.mp.split('(')[0].trim()}</div>
+      <div class="reg-sub">${r.mp.split('(')[0]).trim()}</div>
     </div>
     <div class="reg-item">
       <div class="reg-label">Social Veto Rule</div>
@@ -747,8 +750,8 @@ function drawRadar(dims){
     ctx.strokeStyle=pct===50?'rgba(0,0,0,.15)':'rgba(0,0,0,.07)';
     ctx.lineWidth=pct===50?1.2:.6;
     ctx.stroke();
-    // Ring label
-    ctx.fillStyle='#aaa';ctx.font='9px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillStyle='#aaa';ctx.font='9px DM Mono,monospace';
+    ctx.textAlign='center';
     ctx.fillText(pct,cx+2,cy-(pct/100)*r-3);
   });
 
@@ -769,27 +772,27 @@ function drawRadar(dims){
   ctx.beginPath();
   keys.forEach((k,i)=>{const a=angle(i),d=(dims[k]/100)*r;i===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);});
   ctx.closePath();
-  ctx.fillStyle='rgba(51,255,162,.15)';ctx.fill();
-  ctx.strokeStyle='#33FFA2';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='rgba(0,180,216,.12)';ctx.fill();
+  ctx.strokeStyle='#00B4D8';ctx.lineWidth=2;ctx.stroke();
 
-  // Magenta overlay for social dims
+  // Social overlay for social dims
   const socialKeys=['gender','social','governance'];
   ctx.beginPath();
   socialKeys.forEach((k,idx)=>{
     const i=keys.indexOf(k),a=angle(i),d=(dims[k]/100)*r;
     idx===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);
   });
-  ctx.strokeStyle='rgba(255,51,255,.4)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.strokeStyle='rgba(224,64,251,.4)';ctx.lineWidth=1.5;ctx.stroke();
 
   // Data dots + labels
   keys.forEach((k,i)=>{
     const a=angle(i),d=(dims[k]/100)*r;
     const px=cx+Math.cos(a)*d,py=cy+Math.sin(a)*d;
     ctx.beginPath();ctx.arc(px,py,3.5,0,2*Math.PI);
-    ctx.fillStyle=DIM_COLORS[k];ctx.fill();
-    // Label
+    ctx.fillStyle=DIM_COLORS[k];
+    ctx.fill();
     const lx=cx+Math.cos(a)*(r+22),ly=cy+Math.sin(a)*(r+22);
-    ctx.fillStyle='#1A1A1A';ctx.font='bold 10px Inter,sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='#0D1B2A';ctx.font='bold 10px Inter,sans-serif';ctx.textAlign='center';
     ctx.fillText(DIM_LABELS[k].split(' ')[0],lx,ly+4);
   });
 }
@@ -812,9 +815,9 @@ async function downloadPDF(){
   let y=0;
   const r=lastResult;
 
-  const DARK=[26,26,46],MINT=[51,255,162],MAG=[255,51,255],GREY=[115,115,115];
-  const WHITE=[240,237,230],INK=[26,26,26],DG=[26,107,58],GREEN=[51,170,102];
-  const AMBER=[232,160,32],RED=[204,51,51];
+  const DARK=[13,27,42],ACCENT=[0,180,216],SOCIAL=[224,64,251],GREY=[108,117,125];
+  const WHITE=[248,249,250],INK=[13,27,42],DG=[0,200,83],GREEN=[76,175,80];
+  const AMBER=[255,179,0],RED=[255,82,82];
   const BAND_CLR={'Dark Green':DG,'Green':GREEN,'Amber':AMBER,'Red':RED};
 
   const sf=(s,sz,c)=>{doc.setFont('helvetica',s);doc.setFontSize(sz);if(c)doc.setTextColor(...c);};
@@ -826,23 +829,23 @@ async function downloadPDF(){
 
   // ── HEADER ──
   doc.setFillColor(...DARK);doc.rect(0,0,W,48,'F');
-  doc.setFillColor(...MINT);doc.rect(0,48,W,2,'F');
+  doc.setFillColor(...ACCENT);doc.rect(0,48,W,2,'F');
   if(logoData){try{doc.addImage(logoData,'PNG',M,10,24,24);}catch(e){}}
-  else{doc.setFillColor(...MINT);doc.circle(M+5,24,5,'F');}
-  sf('bold',20,WHITE);doc.text('IDRIS',logoData?M+30:M+14,22);
-  sf('normal',9,GREY); doc.text('Impact Due Diligence Risk Intelligence Scoring',logoData?M+30:M+14,30);
+  else{doc.setFillColor(...ACCENT);doc.circle(M+5,24,5,'F');}
+  sf('bold',20,WHITE);doc.text('DANKI',logoData?M+30:M+14,22);
+  sf('normal',9,GREY); doc.text('Impact Scoring — Project Due Diligence Report',logoData?M+30:M+14,30);
   sf('normal',7,GREY); doc.text('Project: '+r.projName+' | '+r.country+' | '+r.sector,logoData?M+30:M+14,37);
   sf('normal',7,GREY); doc.text('Generated: '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}),logoData?M+30:M+14,43);
-  sf('bold',8,MINT);   doc.text('Danki Studio',W-M,22,{align:'right'});
-  sf('normal',7,GREY); doc.text('Nambona Adeline YANGUERE',W-M,29,{align:'right'});
+  sf('bold',8,ACCENT);   doc.text('Danki Studio',W-M,22,{align:'right'});
+  sf('normal',7,GREY); doc.text('Nambona YANGUERE',W-M,29,{align:'right'});
   y=56;
 
   // ── COMPOSITE SCORE ──
-  sf('bold',9,MINT);doc.text('IDRIS COMPOSITE SCORE',M,y);
-  doc.setFillColor(...MINT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
+  sf('bold',9,ACCENT);doc.text('DANKI COMPOSITE SCORE',M,y);
+  doc.setFillColor(...ACCENT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
   const bc=BAND_CLR[r.band]||GREY;
   doc.setFillColor(...bc);rr(M,y,cW,28,3,'F');
-  sf('bold',28,WHITE);doc.text(r.idris.toFixed(1),M+10,y+20);
+  sf('bold',28,WHITE);doc.text(r.danki.toFixed(1),M+10,y+20);
   sf('normal',9,WHITE);doc.text('/100',M+40,y+20);
   sf('bold',10,WHITE); doc.text(r.band.toUpperCase(),M+60,y+16);
   sf('normal',7,WHITE);doc.text('SFDR: '+r.sfdr,M+60,y+22);
@@ -851,11 +854,11 @@ async function downloadPDF(){
   y+=34;
 
   // ── DIMENSIONS ──
-  sf('bold',9,MINT);doc.text('IMPACT DIMENSIONS',M,y);
-  doc.setFillColor(...MINT);doc.rect(M,y+1.5,30,.5,'F');y+=8;
+  sf('bold',9,ACCENT);doc.text('IMPACT DIMENSIONS',M,y);
+  doc.setFillColor(...ACCENT);doc.rect(M,y+1.5,30,.5,'F');y+=8;
   DIM_ORDER.forEach((k,i)=>{
     const ry=y+i*8,val=r.dims[k],bw=(cW-60)*(val/100);
-    const c=val<30?RED:(val<50?AMBER:(k==='gender'||k==='social'||k==='governance'?[180,80,200]:[51,180,100]));
+    const c=val<30?RED:(val<50?AMBER:(k==='gender'||k==='social'||k==='governance'?[224,64,251]:[0,180,216]));
     sf('normal',7,GREY);doc.text(DIM_LABELS[k],M,ry+3);
     doc.setFillColor(220,220,220);rr(M+55,ry,cW-60,5,1,'F');
     doc.setFillColor(...c);rr(M+55,ry,bw,5,1,'F');
@@ -864,8 +867,8 @@ async function downloadPDF(){
   y+=DIM_ORDER.length*8+6;
 
   // ── REGULATORY ──
-  sf('bold',9,MINT);doc.text('REGULATORY FRAMEWORK',M,y);
-  doc.setFillColor(...MINT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
+  sf('bold',9,ACCENT);doc.text('REGULATORY FRAMEWORK',M,y);
+  doc.setFillColor(...ACCENT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
   const regs=[
     ['EU Taxonomy',r.taxElig?(r.taxAlign?'Aligned':'Not aligned'):'Not eligible',r.taxElig&&r.taxAlign?DG:GREY],
     ['SFDR',r.sfdr,r.sfdr==='Article 9'?DG:(r.sfdr==='Article 8'?GREEN:GREY)],
@@ -898,7 +901,7 @@ async function downloadPDF(){
     y+=2;
   }
   if(strengths.length){
-    if(y>H-60){doc.addPage();doc.setFillColor(247,247,245);doc.rect(0,0,W,H,'F');y=M;}
+    if(y>H-60){doc.addPage();doc.setFillColor(248,249,250);doc.rect(0,0,W,H,'F');y=M;}
     sf('bold',9,DG);doc.text('STRENGTHS',M,y);
     doc.setFillColor(...DG);doc.rect(M,y+1.5,20,.5,'F');y+=7;
     strengths.forEach(s=>{
@@ -912,8 +915,8 @@ async function downloadPDF(){
     const canvas=await html2canvas(document.getElementById('scoreCard'),{scale:1.3,backgroundColor:'#FFFFFF',useCORS:true,logging:false});
     const img=canvas.toDataURL('image/jpeg',.8);
     const ih=(canvas.height/canvas.width)*cW;
-    if(y+ih+20>H-15){doc.addPage();doc.setFillColor(247,247,245);doc.rect(0,0,W,H,'F');y=M;}
-    sf('bold',9,MINT);doc.text('SCORE CARD SNAPSHOT',M,y);y+=6;
+    if(y+ih+20>H-15){doc.addPage();doc.setFillColor(248,249,250);doc.rect(0,0,W,H,'F');y=M;}
+    sf('bold',9,ACCENT);doc.text('SCORE CARD SNAPSHOT',M,y);y+=6;
     doc.addImage(img,'JPEG',M,y,cW,ih);y+=ih+5;
   }catch(e){console.warn('Screenshot skipped:',e);}
 
@@ -922,15 +925,15 @@ async function downloadPDF(){
   for(let p=1;p<=np;p++){
     doc.setPage(p);
     doc.setFillColor(...DARK);doc.rect(0,H-12,W,12,'F');
-    doc.setFillColor(...MINT); doc.rect(0,H-12,W,1,'F');
+    doc.setFillColor(...ACCENT); doc.rect(0,H-12,W,1,'F');
     sf('normal',6,GREY);
-    doc.text('IDRIS v1.0 — Impact & Due Diligence Risk Intelligence Scoring — Danki Studio',M,H-5);
+    doc.text('Danki Impact Scoring v1.0 — Project Due Diligence Report — Danki Studio',M,H-5);
     doc.text('Page '+p+'/'+np,W-M,H-5,{align:'right'});
     sf('normal',5.5,[70,70,70]);
     doc.text('Composite index — not a substitute for full investment due diligence. For professional use only.',M,H-2);
   }
 
-  const fname='IDRIS-'+r.projName.replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.pdf';
+  const fname='Danki-'+r.projName.replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.pdf';
   doc.save(fname);
   btn.disabled=false;
   btn.innerHTML='&#8595; Download Due Diligence Report (PDF)';

@@ -1,795 +1,1143 @@
 ---
-title: "IDRIS — Impact & Due Diligence Risk Intelligence Scoring"
+title: "Danki Impact Scoring"
 subtitle: "Methodology Whitepaper for Regulators and Investors"
-author: "Nambona Adeline YANGUERE — Danki Studio"
-date: "2026"
+author: "Nambona Yanguere — Danki Studio"
+date: last-modified
 format:
   html:
-    page-layout: full
     toc: true
-    toc-depth: 3
-    toc-title: "Contents"
     number-sections: true
-    echo: false
     code-fold: true
     theme: cosmo
-    css: report-style.css
-    embed-resources: true
+  pdf:
+    documentclass: article
+    number-sections: true
+    toc: true
+    colorlinks: true
+    pdf-engine: xelatex       # Better for fonts/layout
+    fig-format: png           # Critical: Fixes plot crashes in PDF
+    fig-dpi: 300              # High resolution for printing
+    geometry:
+      - margin=1in
 execute:
   echo: false
   warning: false
+  message: false
+jupyter: python3
 ---
 
-```{=html}
-<div class="report-header">
-  <div class="report-header-inner">
-    <div class="report-eyebrow">Methodology Whitepaper · Version 1.0 · 2026</div>
-    <h1 class="report-title">IDRIS</h1>
-    <p class="report-subtitle">Impact &amp; Due Diligence Risk Intelligence Scoring</p>
-    <p class="report-lead">A composite impact scoring framework for investment due diligence,
-    covering projects from €1,500 to €50,000,000 across worldwide geographies.
-    Compliant with EU Taxonomy, SFDR, CSRD/ESRS, TCFD and PRIIPs/MiFID II —
-    and going further by measuring real-world outcomes on climate, gender equity,
-    social mobility, territory, governance, pollution and innovation.</p>
-    <div class="report-badges">
-      <span class="badge badge-green">EU Taxonomy</span>
-      <span class="badge badge-blue">SFDR Art. 6 / 8 / 9</span>
-      <span class="badge badge-teal">CSRD / ESRS</span>
-      <span class="badge badge-orange">TCFD</span>
-      <span class="badge badge-purple">PRIIPs / MiFID II</span>
-    </div>
-    <div class="sdg-row">
-      <span class="sdg-label">SDG alignment:</span>
-      <svg class="sdg-tile" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">2</text><text x="50" y="62" font-family="Arial" font-size="10" fill="white" text-anchor="middle">ZERO</text><text x="50" y="75" font-family="Arial" font-size="10" fill="white" text-anchor="middle">HUNGER</text></svg>
-      <svg class="sdg-tile" viewBox="0 0 100 100"><rect width="100" height="100" fill="#26BDE2"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">6</text><text x="50" y="62" font-family="Arial" font-size="10" fill="white" text-anchor="middle">CLEAN WATER</text><text x="50" y="75" font-family="Arial" font-size="10" fill="white" text-anchor="middle">&amp; SANITATION</text></svg>
-      <svg class="sdg-tile" viewBox="0 0 100 100"><rect width="100" height="100" fill="#BF8B2E"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">12</text><text x="50" y="60" font-family="Arial" font-size="9" fill="white" text-anchor="middle">RESPONSIBLE</text><text x="50" y="73" font-family="Arial" font-size="9" fill="white" text-anchor="middle">CONSUMPTION</text></svg>
-      <svg class="sdg-tile" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3F7E44"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">13</text><text x="50" y="62" font-family="Arial" font-size="10" fill="white" text-anchor="middle">CLIMATE</text><text x="50" y="75" font-family="Arial" font-size="10" fill="white" text-anchor="middle">ACTION</text></svg>
-      <svg class="sdg-tile" viewBox="0 0 100 100"><rect width="100" height="100" fill="#56C02B"/><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">15</text><text x="50" y="62" font-family="Arial" font-size="10" fill="white" text-anchor="middle">LIFE</text><text x="50" y="75" font-family="Arial" font-size="10" fill="white" text-anchor="middle">ON LAND</text></svg>
-    </div>
-  </div>
-</div>
+```{python}
+#| echo: false
+#| output: false
+import pandas as pd
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from pathlib import Path
+
+DATA_PATH = Path("../data/processed/investment_impacts.csv")
+if DATA_PATH.exists():
+    df = pd.read_csv(DATA_PATH)
+else:
+    import sys
+    sys.path.insert(0, str(Path("../src")))
+    from generate_data import main as gen_main
+    gen_main()
+    df = pd.read_csv(DATA_PATH)
+
+C = {
+    "primary": "#0D1B2A",
+    "accent": "#00B4D8",
+    "social": "#E040FB",
+    "green": "#00E676",
+    "amber": "#FFB300",
+    "red": "#FF5252",
+    "dark_green": "#00C853",
+    "muted": "#6C757D",
+    "bg": "#F8F9FA",
+}
+
+DIMS = ["climate","water","gender","social_mobility","territory","corruption","pollution","innovation"]
+DIM_LABELS = {
+    "climate": "Climate & Environment",
+    "water": "Water & Resources",
+    "gender": "Gender & Social Equity",
+    "social_mobility": "Social Mobility",
+    "territory": "Territory & Local Wealth",
+    "corruption": "Governance & Corruption",
+    "pollution": "Pollution & Health",
+    "innovation": "Innovation & Resilience",
+}
+WEIGHTS = {
+    "climate": 0.18, "water": 0.08, "gender": 0.20,
+    "social_mobility": 0.15, "territory": 0.08, "corruption": 0.15,
+    "pollution": 0.10, "innovation": 0.06,
+}
+
+def style_plot(ax, title="", xlabel="", ylabel=""):
+    ax.set_facecolor("#FFFFFF")
+    ax.figure.set_facecolor("#F8F9FA")
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color("#DEE2E6")
+    ax.spines['bottom'].set_color("#DEE2E6")
+    ax.tick_params(colors="#6C757D", labelsize=9)
+    if title: ax.set_title(title, fontsize=13, fontweight='bold', color="#0D1B2A", pad=12)
+    if xlabel: ax.set_xlabel(xlabel, fontsize=10, color="#6C757D")
+    if ylabel: ax.set_ylabel(ylabel, fontsize=10, color="#6C757D")
+
+# Derive band column
+df['band'] = pd.cut(df['danki_score'], bins=[0, 35, 55, 75, 100], labels=["Red", "Amber", "Green", "Dark Green"], include_lowest=True)
 ```
 
-## Executive Summary {.unnumbered}
+::: {.hero-banner}
 
-IDRIS is an **impact-first due diligence scoring framework** designed for investment
-professionals, ESG compliance officers, external investors and regulators evaluating
-projects from €1,500 micro-investments to €50,000,000 infrastructure and private equity
-transactions across all geographies.
+# DANKI IMPACT SCORING
 
-Unlike conventional ESG rating systems — which measure corporate sustainability
-*disclosures* — IDRIS measures the **real-world outcomes** of an investment activity
-against today's critical global challenges: climate change, gender inequality, social
-mobility, territorial wealth distribution, pollution, corruption and democratic governance.
+::: {.subtitle}
+Methodology Whitepaper — Scoring Framework, Data Architecture & Validation
+:::
 
-The framework operates on two layers:
+::: {.version}
+v1.0 · January 2025 · For analysts, compliance officers, regulators & LPs
+:::
 
-- **Regulatory compliance gate** — verifies adherence to the five applicable EU
-  frameworks (EU Taxonomy, SFDR, CSRD/ESRS, TCFD, PRIIPs/MiFID II)
-- **Extended impact composite score** — measures transformative outcomes across
-  eight dimensions, weighted to reflect the empirically-established hierarchy of
-  social determinants
-
-The central methodological departure from ESG is the **Social Priority Principle**:
-gender equity, social mobility and governance together account for **50% of the total
-score**, on the basis that social determinants are upstream of all other outcomes. A
-project delivering strong climate metrics but failing on gender equity or local value
-creation is extractive, not transformative. IDRIS will not classify it as green.
-
-This whitepaper is addressed to four audiences: **investment analysts** who use the
-scoring app daily; **ESG and compliance officers** who need to map outputs to regulatory
-obligations; **external investors and LPs** who need to understand methodology
-robustness; and **regulators** (AMF, ECB, EBA) who need to verify that the framework
-meets or exceeds current EU requirements.
+:::
 
 ---
 
-## The Problem with ESG
+# Executive Summary
 
-### ESG Measures Disclosure, Not Outcome
+::: {.card .card-accent}
 
-The widespread adoption of ESG frameworks since 2015 has produced a paradox: the
-volume of sustainability disclosure has increased dramatically while the measurable
-real-world outcomes on climate, inequality and biodiversity have continued to deteriorate.
-The reason is structural. ESG frameworks — including those mandated by SFDR and CSRD —
-measure whether a company *reports on* environmental and social risks, not whether its
-activities *produce positive outcomes* for people and ecosystems.
+Danki Impact Scoring is a dual-layer scoring engine designed for impact investors who need to go beyond ESG compliance. It produces a composite impact score (0–100) for any investment project, covering 8 impact dimensions weighted toward social outcomes, with full regulatory compliance verification across 5 EU frameworks.
 
-A coal company with excellent sustainability reporting will score well on SFDR PAI
-disclosure. A microfinance institution in rural Senegal with no compliance department will
-score poorly. The signal is inverted relative to impact.
+### Key differentiators from ESG scoring:
 
-### The Green and Social Washing Problem
+- **Social-first philosophy**: Gender & Social Equity (20%) + Social Mobility (15%) + Governance (15%) = **50% of total weight** on social foundations
+- **Social veto rule**: Projects scoring below 30 on Gender or Social Mobility are **capped at Amber** regardless of environmental performance
+- **Regulatory completeness**: EU Taxonomy, SFDR (Art. 6/8/9), CSRD/ESRS, TCFD, MiFID II suitability — all checked automatically
+- **Explainable by design**: Every score traces to a published formula and regulatory standard — zero black box
 
-IDRIS is designed explicitly to resist greenwashing and social washing — the practices by
-which investment products present themselves as sustainable or impactful without
-substantive evidence of real-world benefit. The three design choices that operationalise
-this resistance are:
+:::
 
-**Outcome orientation.** Every dimension score is derived from observable project
-characteristics — sector, geography, investment size, GHG intensity — not from
-self-reported ESG disclosures, which are subject to selection bias, measurement
-inconsistency and regulatory arbitrage.
+## Why Not ESG?
 
-**Social Priority Principle.** By weighting gender equity and social mobility at 35% of
-the total composite, IDRIS ensures that no project can reach a Green or Dark Green band
-through environmental performance alone. Climate action that does not benefit women,
-workers and local communities is not transformative impact.
+ESG ratings measure **risk to the company from sustainability factors**. Impact scoring measures **the company's effect on the world**. These are fundamentally different questions.
 
-**Social Veto Rule.** If a project scores below 30 out of 100 on either the gender equity
-or social mobility dimension, it is automatically capped at Amber regardless of its
-composite score. This is not a penalty — it is a recognition that certain social failures
-are disqualifying, not merely penalising.
+A mining company with excellent ESG governance can still destroy communities. A solar farm with perfect environmental metrics can still exploit workers. ESG would score both highly. **Danki Impact Scoring would not.**
+
+The social veto rule operationalises this distinction: no project achieves a Green band if it fails people, regardless of how well it treats the planet.
 
 ---
 
-## The IDRIS Framework
+# The Scoring Framework
 
-### Design Principles
+## Architecture Overview
 
-IDRIS was designed around five principles drawn from the impact investment literature
-(IMP, GIIN, Bridgespan Group, UNDP SDG Finance):
+::: {.architecture-box}
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   DANKI IMPACT SCORING                          │
+│                   Scoring Architecture                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  INPUT                                                          │
+│  ├── Project metadata (country, sector, asset class, size)      │
+│  ├── 8 dimension indicators (quantitative + qualitative)        │
+│  ├── PAI values (GHG intensity, gender gap, corruption flag)    │
+│  └── SFDR classification intent (Art. 6 / 8 / 9)               │
+│                                                                 │
+│  LAYER 1 — Regulatory Compliance Gate                           │
+│  ├── EU Taxonomy: Substantial Contribution + DNSH               │
+│  ├── SFDR: 18 mandatory PAI indicators                          │
+│  ├── CSRD/ESRS: Double materiality scope                        │
+│  ├── TCFD: Physical + transition risk                           │
+│  └── MiFID II: Sustainability preference alignment              │
+│                                                                 │
+│  LAYER 2 — Impact Composite Score (0–100)                       │
+│  ├── 8 weighted dimensions (social-first: 50% social weight)    │
+│  ├── Social Veto Rule (Gender<30 OR Social<30 → Amber cap)      │
+│  └── Band assignment: Red / Amber / Green / Dark Green          │
+│                                                                 │
+│  LAYER 3 — ML Calibration (roadmap)                             │
+│  ├── XGBoost adjustment for country/sector/size interactions    │
+│  └── Trained on validated benchmark data                        │
+│                                                                 │
+│  OUTPUT                                                         │
+│  ├── Composite score + band + radar chart                       │
+│  ├── Regulatory gate dashboard (pass/fail per framework)        │
+│  ├── PAI traffic-light dashboard                                │
+│  ├── Warnings & strengths                                       │
+│  └── PDF due diligence report                                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+:::
 
-1. **Additionality.** The framework rewards investments that go beyond what would have
-   happened anyway — projects in underserved geographies, underfinanced sectors, or
-   with explicit inclusion mandates score higher than equivalent projects in
-   well-served markets.
+## The 8 Impact Dimensions
 
-2. **Materiality.** Scores are weighted toward dimensions where the investment has
-   measurable causal influence — a microfinance project has high gender and social
-   materiality; a renewable energy plant has high climate and pollution materiality.
+::: {.card .card-social}
 
-3. **Contextualisation.** Country-level data (Transparency International CPI, ND-GAIN
-   Climate Vulnerability Index, UNDP Human Development Index) adjusts scores for
-   operating context. A 5 MW solar plant in Nigeria represents greater additionality
-   than the same plant in Denmark.
+### Social-First Weighting Philosophy
 
-4. **Explainability.** Every component of every dimension score is a simple algebraic
-   function of observable inputs. There are no black-box transformations, no
-   embeddings, no latent variables. Any analyst or regulator can reproduce any score
-   from first principles using the formulas in @sec-formulas.
+Academic literature (World Bank, UNDP, GIIN) consistently shows that social determinants are upstream of environmental outcomes. Gender equality is the single strongest predictor of long-term development. Social mobility determines whether economic value stays in a territory. Governance is the multiplier — it either amplifies or destroys every other dimension.
 
-5. **Regulatory coherence.** The framework is designed to be a *superset* of
-   regulatory requirements — every SFDR PAI indicator is represented, every EU Taxonomy
-   objective is addressable, every TCFD category is covered. Passing the regulatory gate
-   is a necessary but not sufficient condition for a high IDRIS score.
+**The Danki principle**: a solar farm built on grabbed land, staffed by imported labour, with a 40% gender pay gap is not impact. ESG would score it green. Danki would not.
 
-### Architecture Overview
+:::
 
-```{=html}
-<div class="architecture-diagram">
-  <div class="arch-layer arch-input">
-    <div class="arch-layer-label">INPUTS</div>
-    <div class="arch-chips">
-      <span class="chip">Country</span><span class="chip">Sector</span>
-      <span class="chip">Asset class</span><span class="chip">Investment size (€)</span>
-      <span class="chip">GHG intensity</span><span class="chip">Gender factor</span>
-      <span class="chip">Governance score</span>
-    </div>
-  </div>
-  <div class="arch-arrow">&#8595;</div>
-  <div class="arch-layer arch-context">
-    <div class="arch-layer-label">CONTEXT CALIBRATION</div>
-    <div class="arch-chips">
-      <span class="chip chip-blue">TI CPI (corruption)</span>
-      <span class="chip chip-blue">ND-GAIN (climate vulnerability)</span>
-      <span class="chip chip-blue">UNDP HDI (development)</span>
-      <span class="chip chip-blue">Log-scale investment normalisation</span>
-    </div>
-  </div>
-  <div class="arch-arrow">&#8595;</div>
-  <div class="arch-layer arch-dimensions">
-    <div class="arch-layer-label">8 IMPACT DIMENSIONS (0–100 each)</div>
-    <div class="arch-chips">
-      <span class="chip chip-mint">Gender 20%</span>
-      <span class="chip chip-mint">Social 15%</span>
-      <span class="chip chip-mint">Governance 15%</span>
-      <span class="chip chip-green">Climate 18%</span>
-      <span class="chip chip-green">Pollution 10%</span>
-      <span class="chip chip-green">Water 8%</span>
-      <span class="chip chip-grey">Territory 8%</span>
-      <span class="chip chip-grey">Innovation 6%</span>
-    </div>
-  </div>
-  <div class="arch-arrow">&#8595;</div>
-  <div class="arch-row-two">
-    <div class="arch-layer arch-veto">
-      <div class="arch-layer-label">SOCIAL VETO RULE</div>
-      <p class="arch-note">Gender &lt; 30 OR Social &lt; 30<br/>&#8594; Band capped at Amber</p>
-    </div>
-    <div class="arch-layer arch-composite">
-      <div class="arch-layer-label">COMPOSITE SCORE</div>
-      <p class="arch-note">Weighted sum 0–100<br/>Band: Red / Amber / Green / Dark Green</p>
-    </div>
-  </div>
-  <div class="arch-arrow">&#8595;</div>
-  <div class="arch-layer arch-regulatory">
-    <div class="arch-layer-label">REGULATORY GATE (5 frameworks)</div>
-    <div class="arch-chips">
-      <span class="chip chip-orange">EU Taxonomy</span>
-      <span class="chip chip-orange">SFDR Art. 6/8/9</span>
-      <span class="chip chip-orange">CSRD/ESRS</span>
-      <span class="chip chip-orange">TCFD</span>
-      <span class="chip chip-orange">PRIIPs/MiFID II</span>
-    </div>
-  </div>
-</div>
+| Dimension | Weight | Key Indicators | Regulatory Basis |
+|:---|:---:|:---|:---|
+| **Gender & Social Equity** | **20%** | Gender pay gap, board diversity, pay ratio, anti-discrimination policy | SFDR PAI 12–13, CSDDD Art. 3–7, IFC PS2 |
+| **Social Mobility** | **15%** | Local hiring %, living wage ratio, skills uplift, education access | OECD Guidelines Ch. V, SDG 1/4/8/10 |
+| **Governance & Corruption** | **15%** | Beneficial ownership transparency, AML flags, CPI score, sanctions | SFDR PAI 15–16, EU AML Directive 6 |
+| **Climate & Environment** | **18%** | GHG avoided, energy transition alignment, biodiversity net gain | EU Taxonomy Obj. 1–2, TCFD, SFDR PAI 1–6 |
+| **Pollution & Health** | **10%** | Scope 1–3 emissions, toxic exposure, air/soil quality | SFDR PAI 1–4, 8–9, EU Taxonomy Obj. 5 |
+| **Water & Resources** | **8%** | Water intensity, circular economy rate, waste | EU Taxonomy Obj. 3, SFDR PAI 7–8 |
+| **Territory & Local Wealth** | **8%** | Local GDP contribution, supply chain localisation, tax transparency | CSRD ESRS S3, OECD MNE Guidelines |
+| **Innovation & Resilience** | **6%** | Tech transferability, employment durability, R&D intensity | EU Taxonomy Obj. 6, SDG 9 |
+
+: Danki Impact Scoring — Dimension Weights {.striped}
+
+**Social total: 50%** (Gender 20% + Social Mobility 15% + Governance 15%)
+— **Environmental total: 36%** (Climate 18% + Pollution 10% + Water 8%)
+— **Economic total: 14%** (Territory 8% + Innovation 6%)
+
+```{python}
+#| label: fig-weights
+#| fig-cap: "Dimension weight distribution — social dimensions represent 50% of total score"
+
+fig, ax = plt.subplots(figsize=(10, 5))
+dims_sorted = sorted(WEIGHTS.items(), key=lambda x: x[1], reverse=True)
+labels = [DIM_LABELS[d] for d, _ in dims_sorted]
+values = [w * 100 for _, w in dims_sorted]
+colors = []
+for d, _ in dims_sorted:
+    if d in ("gender", "social_mobility", "corruption"):
+        colors.append(C["social"])
+    elif d in ("climate", "pollution", "water"):
+        colors.append(C["accent"])
+    else:
+        colors.append(C["muted"])
+
+bars = ax.barh(labels[::-1], values[::-1], color=colors[::-1], edgecolor="#FFFFFF", linewidth=0.5, height=0.65)
+for bar, val in zip(bars, values[::-1]):
+    ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height()/2, f"{val:.0f}%",
+            va='center', fontsize=10, fontweight='bold', color=C["primary"])
+
+ax.set_xlim(0, 25)
+style_plot(ax, title="Danki Dimension Weights", xlabel="Weight (%)")
+ax.axvline(x=0, color=C["primary"], linewidth=0.5)
+
+from matplotlib.patches import Patch
+legend_elements = [
+    Patch(facecolor=C["social"], label='Social (50%)'),
+    Patch(facecolor=C["accent"], label='Environmental (36%)'),
+    Patch(facecolor=C["muted"], label='Economic (14%)'),
+]
+ax.legend(handles=legend_elements, loc='lower right', frameon=True, fontsize=9)
+plt.tight_layout()
+plt.show()
+```
+
+## Social Veto Rule
+
+::: {.callout-important}
+
+**SOCIAL VETO**: If a project scores below 30/100 on Gender & Social Equity **OR** Social Mobility, the maximum achievable band is **Amber**, regardless of the composite score.
+
+A project scoring 85/100 overall but 25/100 on gender is capped at Amber with an explicit veto warning.
+
+:::
+
+**Regulatory basis for the veto**:
+
+- **SFDR PAI 12–13**: Gender pay gap and board gender diversity are mandatory disclosure indicators
+- **CSDDD Art. 3–7**: Companies must identify, prevent and address adverse human rights impacts
+- **IFC Performance Standard 2**: Labour and working conditions requirements for all IFC investments
+- **OECD Guidelines for MNEs, Ch. V**: Employment and industrial relations standards
+
+**Implementation**:
+
+```python
+def _assign_band(composite: float, gender_dim: float, social_dim: float) -> tuple:
+    veto = gender_dim < 30.0 or social_dim < 30.0
+    if composite >= 75:
+        raw_band = "Dark Green"
+    elif composite >= 55:
+        raw_band = "Green"
+    elif composite >= 35:
+        raw_band = "Amber"
+    else:
+        raw_band = "Red"
+
+    if veto and raw_band in ("Dark Green", "Green"):
+        return "Amber", True   # Capped
+    return raw_band, veto and raw_band == "Amber"
+```
+
+## Score Bands
+
+| Band | Range | Meaning | SFDR Alignment |
+|:---|:---:|:---|:---|
+| 🟢 **Dark Green** | 75–100 | Exceptional positive impact across all dimensions | Article 9 eligible |
+| 🟢 **Green** | 55–74 | Meaningful positive impact, minor gaps | Article 8+ eligible |
+| 🟡 **Amber** | 35–54 | Mixed impact, significant improvement needed | Article 8 minimum / Article 6 |
+| 🔴 **Red** | 0–34 | Net negative or negligible impact | Article 6 only |
+
+: Score Band Decision Table {.striped}
+
+---
+
+# Dimension Scoring Formulas
+
+Each dimension score is computed from observable indicators using transparent, auditable formulas. All scores are on a 0–100 scale.
+
+## Gender & Social Equity (20%)
+
+
+$$
+G = \min\Bigl(100,\; 100 \times (1 - \text{gender\_pay\_gap}) \times \text{board\_diversity} \times \text{policy\_factor}\Bigr)
+$$
+
+
+Where:
+
+- `gender_pay_gap` ∈ [0, 1]: Ratio of pay gap (0 = no gap, 1 = complete gap)
+- `board_diversity` ∈ [0, 1]: Proportion of women on board
+- `policy_factor` ∈ {0.6, 0.8, 1.0}: Anti-discrimination policy strength (none / basic / comprehensive)
+
+**Score interpretation**: A company with 0% pay gap, 50% board diversity and comprehensive policy scores ~50. To reach 80+, the company needs near-zero gap with majority-female leadership.
+
+## Social Mobility (15%)
+
+
+$$
+S = \min\Bigl(100,\; 100 \times \text{local\_hire\_ratio} \times \text{living\_wage\_ratio} \times \text{skills\_factor}\Bigr)
+$$
+
+
+Where:
+
+- `local_hire_ratio` ∈ [0, 1]: Proportion of workforce hired locally
+- `living_wage_ratio` ∈ [0.5, 2.0]: Ratio of median wage to local living wage
+- `skills_factor` ∈ {0.6, 0.8, 1.0}: Skills uplift programme (none / basic / comprehensive)
+
+## Governance & Corruption (15%)
+
+
+$$
+V = \min\Bigl(100,\; \text{CPI}_{country} \times \text{transparency\_factor} \times (1 - \text{sanctions\_flag})\Bigr)
+$$
+
+
+Where:
+
+- `CPI_country` ∈ [0, 100]: Transparency International Corruption Perceptions Index
+- `transparency_factor` ∈ {0.5, 0.75, 1.0}: Beneficial ownership disclosure level
+- `sanctions_flag` ∈ {0, 1}: Active sanctions or AML flags (binary penalty)
+
+## Climate & Environment (18%)
+
+
+$$
+C = \min\Bigl(100,\; \text{taxonomy\_alignment} \times 100 \times \text{transition\_factor} \times (1 - \text{stranding\_risk})\Bigr)
+$$
+
+
+Where:
+
+- `taxonomy_alignment` ∈ [0, 1]: EU Taxonomy substantial contribution score
+- `transition_factor` ∈ {0.6, 0.8, 1.0}: Energy transition pathway strength
+- `stranding_risk` ∈ [0, 1]: Probability of asset stranding under 1.5°C scenario
+
+## Pollution & Health (10%)
+
+
+$$
+P = \max\Bigl(0,\; 100 - (\text{emission\_intensity} \times 0.5) - (\text{toxic\_exposure} \times 30)\Bigr)
+$$
+
+
+Where:
+
+- `emission_intensity`: tCO₂e per €M revenue
+- `toxic_exposure` ∈ {0, 1, 2, 3}: Categorical (none / low / medium / high)
+
+
+## Water & Resources (8%)
+
+
+$$
+W = \max\Bigl(0,\; 100 - (\text{water\_intensity} \times 10) + (\text{circular\_rate} \times 30)\Bigr)
+$$
+
+
+## Territory & Local Wealth (8%)
+
+
+$$
+T = \min\Bigl(100,\; \text{local\_procurement\_rate} \times 100 + \text{tax\_transparency} \times 20\Bigr)
+$$
+
+
+## Innovation & Resilience (6%)
+
+
+$$
+I = \min\Bigl(100,\; \text{R\&D\_intensity} \times 500 + \text{tech\_transfer} \times 30 + \text{employment\_durability} \times 20\Bigr)
+$$
+
+
+## Composite Score
+
+
+$$
+\text{Danki Score} = \sum_{d=1}^{8} w_d \times D_d
+$$
+
+
+Where $w_d$ are the dimension weights and $D_d$ are the dimension scores. The composite is then subject to the social veto rule before band assignment.
+
+
+---
+
+# Regulatory Framework Mapping
+
+## Layer 1 — Compliance Gates
+
+Each investment is checked against 5 regulatory frameworks. The output is pass/fail with specific failure reasons.
+
+## EU Taxonomy (Regulation 2020/852)
+
+| Check | Logic | Source |
+|:---|:---|:---|
+| Substantial Contribution | Climate score ≥ 60 AND sector is taxonomy-eligible | Art. 3, Delegated Acts |
+| DNSH | No dimension below 25 | Art. 17 |
+| Minimum Safeguards | Governance ≥ 40 AND Gender ≥ 40 | Art. 18, OECD/ILO/UNGP |
+
+## SFDR (Regulation 2019/2088)
+
+| Classification | Logic |
+|:---|:---|
+| Article 9 | Composite ≥ 75 AND taxonomy aligned AND no veto |
+| Article 8 | Composite ≥ 45 AND taxonomy partially aligned |
+| Article 6 | All other products |
+
+## CSRD/ESRS (Directive 2022/2464)
+
+- **In scope**: Companies with ≥1,000 employees and ≥€450M turnover (post-Omnibus, December 2025)
+- **Out of scope projects**: Danki uses proxy data and reasonable estimates — a key differentiator vs. tools that require full CSRD disclosure
+
+## TCFD (FSB Recommendations)
+
+- Physical risk: Country climate vulnerability × sector exposure
+- Transition risk: Carbon intensity × 1.5°C scenario alignment
+
+## MiFID II Sustainability Preferences
+
+- Taxonomy alignment percentage
+- PAI consideration flag
+- SFDR article classification
+
+---
+
+# Exploratory Data Analysis
+
+The following analysis is based on the synthetic benchmark dataset of 2,000 investment projects across 50 countries, 20 sectors and 6 asset classes.
+
+```{python}
+#| label: fig-score-distribution
+#| fig-cap: "Distribution of Danki composite scores — healthy spread with meaningful Red tail"
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+ax = axes[0]
+bins = np.arange(15, 95, 2.5)
+n, _, patches = ax.hist(df['danki_score'], bins=bins, edgecolor='white', linewidth=0.5, alpha=0.9)
+for patch, left_edge in zip(patches, bins[:-1]):
+    if left_edge >= 75: patch.set_facecolor(C["dark_green"])
+    elif left_edge >= 55: patch.set_facecolor(C["accent"])
+    elif left_edge >= 35: patch.set_facecolor(C["amber"])
+    else: patch.set_facecolor(C["red"])
+
+ax.axvline(df['danki_score'].mean(), color=C["primary"], linestyle='--', linewidth=1.5, label=f"Mean: {df['danki_score'].mean():.1f}")
+ax.axvline(df['danki_score'].median(), color=C["social"], linestyle='--', linewidth=1.5, label=f"Median: {df['danki_score'].median():.1f}")
+style_plot(ax, title="Danki Score Distribution", xlabel="Composite Score (0-100)", ylabel="Count")
+ax.legend(fontsize=9)
+
+ax2 = axes[1]
+band_order = ["Dark Green", "Green", "Amber", "Red"]
+band_colors_list = [C["dark_green"], C["accent"], C["amber"], C["red"]]
+band_counts = df['band'].value_counts()
+counts = [band_counts.get(b, 0) for b in band_order]
+bars = ax2.bar(band_order, counts, color=band_colors_list, edgecolor='white', linewidth=0.5, width=0.6)
+for bar, count in zip(bars, counts):
+    pct = count / len(df) * 100
+    ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5,
+             f"{count}\n({pct:.0f}%)", ha='center', va='bottom', fontsize=10, fontweight='bold', color=C["primary"])
+style_plot(ax2, title="Score Band Distribution", ylabel="Number of Projects")
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-dimension-distributions
+#| fig-cap: "Distribution of each impact dimension — Gender and Social Mobility show full range including veto zone (red dashed line at 30)"
+
+fig, axes = plt.subplots(2, 4, figsize=(16, 8))
+axes_flat = axes.flatten()
+
+for i, dim in enumerate(DIMS):
+    ax = axes_flat[i]
+    col = f"{dim}_dim" if f"{dim}_dim" in df.columns else dim
+    if col not in df.columns:
+        for c in df.columns:
+            if dim.replace("_", "") in c.replace("_", "").lower():
+                col = c
+                break
+
+    if col in df.columns:
+        data = df[col].dropna()
+        color = C["social"] if dim in ("gender", "social_mobility", "corruption") else C["accent"]
+        ax.hist(data, bins=30, color=color, alpha=0.7, edgecolor='white', linewidth=0.3)
+        if dim in ("gender", "social_mobility"):
+            ax.axvline(30, color=C["red"], linestyle='--', linewidth=1.5, alpha=0.8, label="Veto threshold")
+            ax.legend(fontsize=7)
+        ax.set_title(DIM_LABELS.get(dim, dim), fontsize=10, fontweight='bold', color=C["primary"])
+        ax.tick_params(labelsize=8)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+    else:
+        ax.text(0.5, 0.5, f"Column:\n{dim}", ha='center', va='center', transform=ax.transAxes, fontsize=9)
+
+plt.suptitle("Dimension Score Distributions", fontsize=13, fontweight='bold', color=C["primary"], y=1.02)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-sector-heatmap
+#| fig-cap: "Mean Danki score by sector — renewable energy and social infrastructure lead, extractive industries trail"
+
+fig, ax = plt.subplots(figsize=(14, 7))
+
+dim_cols = []
+for dim in DIMS:
+    for c in [f"{dim}_dim", dim]:
+        if c in df.columns:
+            dim_cols.append(c)
+            break
+
+if dim_cols and 'sector' in df.columns:
+    sector_means = df.groupby('sector')[dim_cols].mean()
+    sector_means['_total'] = sector_means.mean(axis=1)
+    sector_means = sector_means.sort_values('_total', ascending=True)
+    sector_means = sector_means.drop('_total', axis=1)
+    col_labels = [DIM_LABELS.get(c.replace('_dim', ''), c) for c in dim_cols]
+
+    im = ax.imshow(sector_means.values, cmap='RdYlGn', aspect='auto', vmin=20, vmax=90)
+    ax.set_xticks(range(len(dim_cols)))
+    ax.set_xticklabels(col_labels, rotation=45, ha='right', fontsize=9)
+    ax.set_yticks(range(len(sector_means)))
+    ax.set_yticklabels(sector_means.index, fontsize=9)
+
+    for i in range(len(sector_means)):
+        for j in range(len(dim_cols)):
+            val = sector_means.values[i, j]
+            color = 'white' if val < 40 or val > 75 else 'black'
+            ax.text(j, i, f"{val:.0f}", ha='center', va='center', fontsize=7, color=color, fontweight='bold')
+
+    plt.colorbar(im, ax=ax, label='Mean Dimension Score', shrink=0.8)
+    style_plot(ax, title="Mean Dimension Score by Sector")
+
+plt.tight_layout()
+plt.show()
+```
+```{python}
+#| label: fig-correlation
+#| fig-cap: "Correlation matrix — social dimensions cluster together, confirming upstream driver hypothesis"
+
+fig, ax = plt.subplots(figsize=(10, 8))
+
+dim_cols = []
+for dim in DIMS:
+    for c in [f"{dim}_dim", dim]:
+        if c in df.columns:
+            dim_cols.append(c)
+            break
+
+if dim_cols:
+    corr = df[dim_cols].corr()
+    col_labels = [DIM_LABELS.get(c.replace('_dim', ''), c) for c in dim_cols]
+    im = ax.imshow(corr.values, cmap='coolwarm', vmin=-0.3, vmax=0.8, aspect='equal')
+    ax.set_xticks(range(len(dim_cols)))
+    ax.set_xticklabels(col_labels, rotation=45, ha='right', fontsize=9)
+    ax.set_yticks(range(len(dim_cols)))
+    ax.set_yticklabels(col_labels, fontsize=9)
+
+    for i in range(len(dim_cols)):
+        for j in range(len(dim_cols)):
+            val = corr.values[i, j]
+            color = 'white' if abs(val) > 0.5 else 'black'
+            ax.text(j, i, f"{val:.2f}", ha='center', va='center', fontsize=9, color=color, fontweight='bold')
+
+    plt.colorbar(im, ax=ax, label='Pearson Correlation', shrink=0.8)
+    style_plot(ax, title="Dimension Correlation Matrix")
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-score-vs-size
+#| fig-cap: "Danki score vs. investment size — smaller projects show higher variance, larger projects cluster near sector means"
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+if 'investment_eur' in df.columns:
+    colors_map = {"Dark Green": C["dark_green"], "Green": C["accent"], "Amber": C["amber"], "Red": C["red"]}
+    point_colors = df['band'].astype(str).map(colors_map).fillna(C["muted"])
+    ax.scatter(df['investment_eur'], df['danki_score'], c=point_colors, alpha=0.35, s=15, edgecolors='none')
+    ax.set_xscale('log')
+
+    for threshold, label, color in [(75, "Dark Green", C["dark_green"]), (55, "Green", C["accent"]), (35, "Amber", C["amber"])]:
+        ax.axhline(threshold, color=color, linestyle='--', linewidth=1, alpha=0.6, label=f"{label} threshold ({threshold})")
+
+    style_plot(ax, title="Danki Score vs. Investment Size", xlabel="Investment Size (EUR, log scale)", ylabel="Danki Score")
+    ax.legend(fontsize=8, loc='lower right')
+    ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: f"EUR {x:,.0f}"))
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-sfdr-breakdown
+#| fig-cap: "SFDR Article classification — realistic distribution reflecting fund composition"
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+if 'sfdr_article' in df.columns:
+    ax = axes[0]
+    sfdr_counts = df['sfdr_article'].value_counts()
+    art_order = ['Article 9', 'Article 8', 'Article 6']
+    art_colors = [C["dark_green"], C["accent"], C["muted"]]
+    counts = [sfdr_counts.get(a, 0) for a in art_order]
+    wedges, texts, autotexts = ax.pie(counts, labels=art_order, colors=art_colors,
+                                       autopct='%1.0f%%', startangle=90,
+                                       textprops={'fontsize': 11, 'fontweight': 'bold'})
+    for t in autotexts:
+        t.set_color('white')
+    ax.set_title("SFDR Classification", fontsize=13, fontweight='bold', color=C["primary"])
+
+    ax2 = axes[1]
+    for art, color in zip(art_order, art_colors):
+        subset = df[df['sfdr_article'] == art]['danki_score']
+        if len(subset) > 0:
+            ax2.hist(subset, bins=30, alpha=0.6, color=color, label=f"{art} (n={len(subset)})", edgecolor='white', linewidth=0.3)
+    style_plot(ax2, title="Score Distribution by SFDR Article", xlabel="Danki Score", ylabel="Count")
+    ax2.legend(fontsize=9)
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-radar-examples
+#| fig-cap: "Radar chart comparison — three projects across the score spectrum. Social dimensions highlighted in magenta."
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 5), subplot_kw=dict(polar=True))
+
+examples = [
+    {"name": "Renewable Energy\nFrance", "scores": [82, 70, 85, 78, 65, 88, 75, 60], "band": "Dark Green"},
+    {"name": "Manufacturing\nBrazil", "scores": [55, 50, 52, 48, 45, 42, 58, 40], "band": "Amber"},
+    {"name": "Extractive\nNigeria", "scores": [30, 25, 22, 20, 35, 18, 28, 15], "band": "Red"},
+]
+
+dim_labels_short = ["Climate", "Water", "Gender", "Social\nMob.", "Territory", "Govern.", "Pollution", "Innov."]
+angles = np.linspace(0, 2 * np.pi, len(dim_labels_short), endpoint=False).tolist()
+angles += angles[:1]
+
+band_colors_map = {"Dark Green": C["dark_green"], "Amber": C["amber"], "Red": C["red"]}
+
+for ax, ex in zip(axes, examples):
+    values = ex["scores"] + ex["scores"][:1]
+    color = band_colors_map[ex["band"]]
+
+    ax.plot(angles, values, 'o-', linewidth=2, color=color, markersize=4)
+    ax.fill(angles, values, alpha=0.15, color=color)
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(dim_labels_short, fontsize=8)
+    ax.set_ylim(0, 100)
+    ax.set_yticks([25, 50, 75, 100])
+    ax.set_yticklabels(["25", "50", "75", "100"], fontsize=7, color=C["muted"])
+    ax.set_title(ex["name"], fontsize=10, fontweight='bold', color=C["primary"], pad=15)
+
+    for i, dim in enumerate(DIMS):
+        if dim in ("gender", "social_mobility", "corruption"):
+            ax.plot([angles[i], angles[i]], [0, ex["scores"][i]], color=C["social"], linewidth=2, alpha=0.5)
+
+plt.suptitle("Impact Profile Comparison", fontsize=12, fontweight='bold', color=C["primary"], y=1.05)
+plt.tight_layout()
+plt.show()
+```
+```{python}
+#| label: fig-country-scores
+#| fig-cap: "Mean Danki score by country (top 20) — geographic coherence confirmed"
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+if 'country' in df.columns:
+    country_stats = df.groupby('country').agg(
+        mean_score=('danki_score', 'mean'),
+        count=('danki_score', 'count')
+    ).sort_values('count', ascending=False).head(20).sort_values('mean_score', ascending=True)
+
+    colors = []
+    for score in country_stats['mean_score']:
+        if score >= 75: colors.append(C["dark_green"])
+        elif score >= 55: colors.append(C["accent"])
+        elif score >= 35: colors.append(C["amber"])
+        else: colors.append(C["red"])
+
+    bars = ax.barh(country_stats.index, country_stats['mean_score'], color=colors, edgecolor='white', linewidth=0.5, height=0.65)
+    for bar, (_, row) in zip(bars, country_stats.iterrows()):
+        ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height()/2,
+                f"{row['mean_score']:.1f} (n={int(row['count'])})",
+                va='center', fontsize=9, color=C["primary"])
+
+    ax.axvline(55, color=C["accent"], linestyle='--', linewidth=1, alpha=0.5, label="Green threshold")
+    ax.axvline(35, color=C["amber"], linestyle='--', linewidth=1, alpha=0.5, label="Amber threshold")
+    style_plot(ax, title="Mean Danki Score by Country (Top 20)", xlabel="Mean Composite Score")
+    ax.legend(fontsize=8)
+
+plt.tight_layout()
+plt.show()
 ```
 
 ---
 
-## Dimension Scoring Methodology {#sec-formulas}
+# ML Calibration Methodology
 
-### Weight Rationale: The Social Priority Principle
+## Approach: Composite Weighted Index with XGBoost Adjustment
 
-The weight allocation reflects a specific theoretical position: **social determinants are
-upstream of environmental outcomes**. This position is grounded in the following evidence:
+The Danki scoring approach prioritises **explainability** — a requirement for regulatory acceptance (SFDR Art. 4, MiFID II suitability assessment). The ML layer is a calibration adjustment, not a replacement for the deterministic composite.
 
-The World Bank's 2023 Gender Strategy demonstrates that gender equality is the single
-strongest predictor of long-term development outcomes, outperforming GDP per capita, rule
-of law and institutional quality as a predictor of sustainable economic growth. UNDP's
-Human Development Index data across 191 countries shows that HDI improvement is
-three times faster in countries with high gender equality scores.
+### Why Composite First, ML Second
 
-Social mobility — the ability of individuals and communities to improve their economic
-position through access to education, employment and services — determines whether
-economic value generated by an investment *stays* in the territory or is extracted by
-distant capital holders. An investment that generates €10M in revenue but captures none
-of it locally has negative territorial impact regardless of its sectoral characteristics.
+| Approach | Explainability | Regulatory Acceptance | Accuracy |
+|:---|:---:|:---:|:---:|
+| Pure ML (black box) | Low | Rejected by AMF/EBA | High |
+| Pure composite (no ML) | High | Accepted | Medium |
+| **Composite + ML calibration** | **High** | **Accepted** | **High** |
 
-Governance and anti-corruption functions as a **multiplier**: in high-corruption
-environments, all other positive impacts are diminished through rent extraction,
-misallocation and institutional decay. The empirical relationship between Transparency
-International CPI scores and development outcomes is among the most robust findings in
-development economics.
+: ML Approach Comparison {.striped}
 
-```{=html}
-<div class="weight-table-wrap">
-  <table class="weight-table">
-    <thead>
-      <tr>
-        <th>Dimension</th><th>Weight</th><th>Priority group</th>
-        <th>Reference standards</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="row-social">
-        <td><strong>Gender &amp; Social Equity</strong></td><td><strong>20%</strong></td>
-        <td><span class="badge badge-mint">Social Primary</span></td>
-        <td>SFDR PAI 12–13, UNDP Gender SDG 5, ILO</td>
-      </tr>
-      <tr class="row-social">
-        <td><strong>Social Mobility</strong></td><td><strong>15%</strong></td>
-        <td><span class="badge badge-mint">Social Primary</span></td>
-        <td>SFDR PAI 9–11, IMP Depth/Duration, GIIN IRIS+</td>
-      </tr>
-      <tr class="row-social">
-        <td><strong>Governance &amp; Anti-Corruption</strong></td><td><strong>15%</strong></td>
-        <td><span class="badge badge-mint">Social Primary</span></td>
-        <td>SFDR PAI 16–17, TI CPI, FATF, CSDDD Art. 3</td>
-      </tr>
-      <tr>
-        <td>Climate &amp; Environment</td><td>18%</td>
-        <td><span class="badge badge-green">Environmental</span></td>
-        <td>EU Taxonomy Obj. 1–2, SFDR PAI 1–4, TCFD</td>
-      </tr>
-      <tr>
-        <td>Pollution &amp; Health</td><td>10%</td>
-        <td><span class="badge badge-green">Environmental</span></td>
-        <td>EU Taxonomy Obj. 3, SFDR PAI 7–9, WHO Air Quality</td>
-      </tr>
-      <tr>
-        <td>Water &amp; Resources</td><td>8%</td>
-        <td><span class="badge badge-green">Environmental</span></td>
-        <td>EU Taxonomy Obj. 4, SFDR PAI 6–8, SDG 6</td>
-      </tr>
-      <tr>
-        <td>Territory &amp; Local Wealth</td><td>8%</td>
-        <td><span class="badge badge-grey">Systemic</span></td>
-        <td>GIIN Place-based impact, OECD Regional Dev., SDG 10–11</td>
-      </tr>
-      <tr>
-        <td>Innovation &amp; Resilience</td><td>6%</td>
-        <td><span class="badge badge-grey">Systemic</span></td>
-        <td>IMP Depth of change, GIIN IRIS+ Employment duration</td>
-      </tr>
-      <tr class="total-row">
-        <td><strong>Total</strong></td><td><strong>100%</strong></td>
-        <td><strong>Social 50% · Environmental 36% · Systemic 14%</strong></td><td></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+### XGBoost Calibration Layer (Phase 3 Roadmap)
+
+The ML layer adjusts the deterministic composite for interaction effects that linear weighting cannot capture:
+
+1. **Country x Sector interactions**: Renewable energy in Norway vs. Nigeria has fundamentally different risk profiles that a country score alone doesn't capture
+2. **Investment size non-linearity**: A EUR 1,500 microfinance project and a EUR 50M infrastructure project are scored on the same 0-100 scale but behave very differently
+3. **Temporal calibration**: As benchmark data accumulates, the model recalibrates weights to reflect observed impact outcomes
+
+**Training pipeline**:
+
+```
+Phase 3 Pipeline:
+1. Validated benchmark dataset (2,000+ scored projects)
+2. Feature engineering: dimension scores + country/sector/size interactions
+3. XGBoost regressor: target = expert-validated Danki score
+4. SHAP values for every prediction -> full explainability preserved
+5. Human-in-the-loop: ML adjustment capped at +/- 10 points from composite
+6. Quarterly retraining on new validated data
 ```
 
-### Gender & Social Equity (20%)
+### ML Architecture
 
-**What it measures:** The degree to which the investment promotes gender equality and
-reduces structural discrimination — in the workplace, the supply chain, and the
-communities served.
+```{python}
+#| label: fig-ml-architecture
+#| fig-cap: "ML calibration pipeline — composite index provides the base, XGBoost adjusts for interactions, SHAP preserves explainability"
 
-**Formula:**
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.axis('off')
 
-$$G = \left( g \cdot 55 + \frac{\text{CPI}}{100} \cdot 25 + \text{HDI} \cdot 15 - \left(1 - \frac{\text{CPI}}{100}\right) \cdot 20 \right) \times \frac{100}{75}$$
+boxes = [
+    (0.02, 0.55, 0.17, 0.30, "INPUT\n\n8 Dimension\nIndicators\n+ Metadata", C["muted"]),
+    (0.22, 0.55, 0.17, 0.30, "COMPOSITE\nINDEX\n\nWeighted Sum\n(deterministic)", C["accent"]),
+    (0.42, 0.55, 0.17, 0.30, "XGBOOST\nCALIBRATION\n\nAdjustment\n(max +/-10 pts)", C["social"]),
+    (0.62, 0.55, 0.17, 0.30, "SHAP\nEXPLAINER\n\nFeature\nContributions", C["amber"]),
+    (0.82, 0.55, 0.16, 0.30, "DANKI\nSCORE\n\n0-100\n+ Band", C["dark_green"]),
+]
 
-Where $g$ is the gender equality factor (0–1, derived from sector and analyst override),
-CPI is the Transparency International Corruption Perception Index (0–100) for the country
-of operation, and HDI is the UNDP Human Development Index (0–1).
+for x, y, w, h, text, color in boxes:
+    rect = plt.Rectangle((x, y), w, h, facecolor=color, alpha=0.12, edgecolor=color, linewidth=2, zorder=2)
+    ax.add_patch(rect)
+    ax.text(x + w/2, y + h/2, text, ha='center', va='center', fontsize=9, fontweight='bold', color=C["primary"], zorder=3)
 
-The term $-(1-\text{CPI}/100)\times 20$ is the **corruption-gender penalty**: high
-corruption actively suppresses women's economic participation through enforcement
-failures, institutional bias and informal economy dominance. This term gives the formula
-its full 0–100 range — a project in a high-corruption, low-development country with a
-gender-insensitive sector will score in the 15–30 range, triggering the Social Veto Rule.
+for x1, x2 in [(0.19, 0.22), (0.39, 0.42), (0.59, 0.62), (0.79, 0.82)]:
+    ax.annotate('', xy=(x2, 0.70), xytext=(x1, 0.70),
+                arrowprops=dict(arrowstyle='->', color=C["primary"], lw=2))
 
-**Social Veto Rule:** If Gender score < 30, the project band is capped at Amber.
+rect = plt.Rectangle((0.30, 0.10), 0.40, 0.22, facecolor=C["red"], alpha=0.08, edgecolor=C["red"], linewidth=2, linestyle='--', zorder=2)
+ax.add_patch(rect)
+ax.text(0.50, 0.21, "SOCIAL VETO RULE\n\nGender < 30 OR Social Mobility < 30\n-> Band capped at Amber", ha='center', va='center', fontsize=9, fontweight='bold', color=C["red"], zorder=3)
 
-### Social Mobility (15%)
+ax.annotate('', xy=(0.90, 0.55), xytext=(0.70, 0.32),
+            arrowprops=dict(arrowstyle='->', color=C["red"], lw=1.5, linestyle='--'))
 
-**What it measures:** The degree to which the investment creates durable economic
-opportunity for local communities — employment quality, skills transfer, living wage
-access, and the share of economic value retained in the territory.
+ax.set_xlim(-0.02, 1.02)
+ax.set_ylim(0.02, 0.95)
+ax.set_title("Danki Impact Scoring — ML Calibration Pipeline", fontsize=14, fontweight='bold', color=C["primary"], pad=15)
 
-**Formula:**
-
-$$S = s_f \cdot 50 + \text{HDI} \cdot 25 + \sigma \cdot 15 + b - (1 - \text{HDI})(1 - s_f) \cdot 25$$
-
-Where $s_f$ is the sector social factor (0.82 for high-social sectors, 0.38 for
-extractive, 0.60 otherwise), $\sigma$ is the investment size factor (log-normalised
-0–1), and $b$ is a sector bonus (+15 for Healthcare, Education, Microfinance, Financial
-Inclusion, Social Infrastructure, Affordable Housing, Water & Sanitation).
-
-The structural deprivation penalty term $(1 - \text{HDI})(1 - s_f) \cdot 25$ ensures
-that an extractive industry project in a low-development country cannot achieve a high
-social mobility score — even at large scale. It is specifically designed to prevent
-large-ticket infrastructure projects in low-HDI countries from scoring well through scale
-alone without genuine local value creation.
-
-**Social Veto Rule:** If Social score < 30, the project band is capped at Amber.
-
-### Governance & Anti-Corruption (15%)
-
-**What it measures:** The institutional quality of the operating environment, the
-transparency of ownership structures, and the exposure to corruption, money laundering
-and regulatory arbitrage.
-
-**Formula:**
-
-$$\Gamma = \frac{\text{CPI}}{100} \cdot 65 + \delta_{\text{EU}} \cdot 20 + \delta_{\text{asset}} \cdot 10$$
-
-Where $\delta_{\text{EU}}$ is 1 if the project is in an EU member state (EU regulatory
-perimeter provides enhanced investor protection, AML enforcement and beneficial ownership
-transparency), and $\delta_{\text{asset}}$ is 1 if the asset class is Green Bond or
-Project Finance (both require structured governance frameworks).
-
-This dimension maps directly to SFDR PAI indicators 16 (exposure to controversial
-weapons) and 17 (tax jurisdiction), and to CSDDD Article 3 due diligence requirements on
-governance of value chain partners.
-
-### Climate & Environment (18%)
-
-**Formula:**
-
-$$C = (1 - \gamma) \cdot 70 + \delta_{\text{tax}} \cdot 20 - V \cdot 15 + \sigma \cdot 5$$
-
-Where $\gamma$ is GHG intensity (0–1, sector default or analyst override), $\delta_{\text{tax}}$
-is 1 if the sector is EU Taxonomy-eligible, $V$ is the ND-GAIN climate vulnerability
-score (0–1) for the country of operation, and $\sigma$ is the size factor.
-
-The vulnerability deduction reflects physical climate risk: a project operating in a
-highly climate-vulnerable territory faces greater risk of stranded assets and reduced
-long-term climate contribution. This term links directly to TCFD physical risk assessment.
-
-### Pollution & Health (10%)
-
-**Formula:**
-
-$$P = (1 - \gamma) \cdot 75 + \delta_{\text{tax}} \cdot 20$$
-
-A simplified function of GHG intensity and taxonomy eligibility. Projects with low
-emissions intensity and in taxonomy-eligible sectors (which must pass DNSH on pollution
-prevention) receive the highest scores. Maps to EU Taxonomy Objective 3 (prevention and
-control of pollution).
-
-### Water & Resources (8%)
-
-**Formula:**
-
-$$W = 70 - \Delta_{\text{water}} - V \cdot 20$$
-
-Where $\Delta_{\text{water}}$ is 40 if GHG intensity > 0.4 (water-intensive sectors
-such as extractive industry and heavy manufacturing), otherwise $\gamma \times 30$.
-Maps to EU Taxonomy Objective 4 and SFDR PAI 6 (water usage and recycling).
-
-### Territory & Local Wealth (8%)
-
-**Formula:**
-
-$$T = 30 + (1 - \text{HDI}) \cdot 40 + \delta_{\text{EU}} \cdot 20 + \sigma \cdot 10$$
-
-The $(1 - \text{HDI}) \cdot 40$ term encodes a key principle: **investments in
-lower-development territories have greater additionality potential**. A €500,000
-microfinance project in rural Ethiopia has greater territorial development impact than the
-same amount invested in a French urban SME, even if the French project is better
-governed. This does not reward poor governance — the governance dimension handles that
-separately. It rewards geographic additionality.
-
-### Innovation & Resilience (6%)
-
-**Formula:**
-
-$$I = 40 + \delta_{\text{innov}} \cdot 30 + \sigma \cdot 20 + \text{HDI} \cdot 10$$
-
-Where $\delta_{\text{innov}}$ is 1 for sectors classified as innovation-intensive:
-Renewable Energy, Digital Infrastructure, Clean Transportation, Energy Efficiency,
-Circular Economy, Education & Skills, Financial Inclusion, Water & Sanitation.
-
----
-
-## The Social Veto Rule
-
-The Social Veto Rule is the most distinctive feature of the IDRIS framework and the one
-most likely to be challenged by issuers seeking high ratings. We address the challenge directly.
-
-**The rule:** If the Gender equity dimension score falls below 30/100 OR the Social
-mobility dimension score falls below 30/100, the project band is capped at **Amber**,
-regardless of the composite IDRIS score. The composite score itself is not altered — it
-still appears in the output — but the regulatory band and SFDR article
-recommendation are downgraded.
-
-**Why 30 and not a higher threshold?** The threshold of 30 is calibrated to represent a
-*structural* failure rather than a *contextual weakness*. A score of 30 on the gender
-dimension corresponds approximately to an extractive sector project operating in a high-
-corruption, very-low-development country with no gender policy provisions. This is not
-a borderline case — it represents a combination of sector, geography and governance
-that is systematically hostile to gender equality. The threshold is not designed to
-penalise well-intentioned projects in difficult contexts; it is designed to identify
-projects where gender equity failure is load-bearing to the business model.
-
-**Regulatory basis:** While no current EU regulation mandates a social veto rule in
-these precise terms, the rule is consistent with:
-
-- SFDR Article 4 mandatory PAI disclosure requirements (PAI 12: gender pay gap,
-  PAI 13: board gender diversity)
-- CSDDD Articles 3–7 on human rights and working conditions due diligence
-- The European Parliament's 2023 position on the Social Taxonomy, which proposed
-  minimum social safeguards as preconditions for taxonomy alignment
-- IFC Performance Standard 2 on Labor and Working Conditions
-- The OECD Guidelines for Multinational Enterprises
-
----
-
-## Regulatory Framework Mapping
-
-### EU Taxonomy
-
-The IDRIS framework maps to all six EU Taxonomy environmental objectives:
-
-| Obj. | Description | IDRIS dimensions |
-|------|-------------|------------------|
-| 1 | Climate change mitigation | Climate (18%), Pollution (10%) |
-| 2 | Climate change adaptation | Climate (18%), Territory (8%) |
-| 3 | Sustainable use of water | Water (8%) |
-| 4 | Circular economy | Water (8%), Innovation (6%) |
-| 5 | Pollution prevention | Pollution (10%) |
-| 6 | Biodiversity | Climate (18%), Water (8%) |
-
-Taxonomy eligibility is assessed by sector classification. Taxonomy alignment requires
-passing the Do No Significant Harm (DNSH) test (GHG intensity < 0.50 AND climate
-vulnerability < 0.70) and achieving a Substantial Contribution score > 40%.
-
-### SFDR Principal Adverse Impact Indicators
-
-All 18 mandatory PAI indicators are represented in the IDRIS aggregate PAI score:
-
-| PAI | Description | IDRIS mapping |
-|-----|-------------|---------------|
-| 1 | GHG emissions intensity | Climate, Pollution dimensions |
-| 2 | Carbon footprint | Climate dimension |
-| 3 | GHG intensity of investee companies | Climate dimension |
-| 4 | Exposure to fossil fuel sector | Sector classification |
-| 5 | Non-renewable energy consumption | Climate, Innovation |
-| 6 | Energy consumption intensity | Water dimension |
-| 7 | Biodiversity-sensitive areas | Climate dimension |
-| 8 | Water emissions | Water dimension |
-| 9 | Hazardous waste | Pollution dimension |
-| 10 | Violations of UNGC / OECD | Governance dimension |
-| 11 | Lack of UNGC / OECD process | Governance dimension |
-| 12 | Unadjusted gender pay gap | Gender dimension |
-| 13 | Board gender diversity | Gender dimension |
-| 14 | Exposure to controversial weapons | Governance dimension |
-| 15 | GHG intensity (real estate) | Climate dimension |
-| 16 | Energy performance (real estate) | Climate dimension |
-| 17 | Exposure to fossil fuels (real estate) | Climate dimension |
-| 18 | Exposure to energy-inefficient assets | Climate dimension |
-
-### SFDR Article Classification Logic
-
-```{=html}
-<div class="sfdr-logic-box">
-  <div class="sfdr-article sfdr-9">
-    <div class="sfdr-art-label">Article 9</div>
-    <div class="sfdr-art-conditions">
-      EU Taxonomy aligned <strong>AND</strong> IDRIS ≥ 72 <strong>AND</strong> PAI score ≥ 70
-    </div>
-    <div class="sfdr-art-desc">Sustainable investment objective. Highest disclosure burden.
-    Product must demonstrate Taxonomy alignment and comprehensive PAI management.</div>
-  </div>
-  <div class="sfdr-article sfdr-8">
-    <div class="sfdr-art-label">Article 8</div>
-    <div class="sfdr-art-conditions">
-      IDRIS ≥ 50 <strong>AND</strong> PAI score ≥ 50
-    </div>
-    <div class="sfdr-art-desc">Promotes environmental or social characteristics. Must disclose
-    PAI consideration methodology and binding E/S elements in investment strategy.</div>
-  </div>
-  <div class="sfdr-article sfdr-6">
-    <div class="sfdr-art-label">Article 6</div>
-    <div class="sfdr-art-conditions">All other cases</div>
-    <div class="sfdr-art-desc">No specific sustainability claims. Sustainability risk
-    integration disclosure required.</div>
-  </div>
-</div>
+plt.tight_layout()
+plt.show()
 ```
 
-### TCFD Climate Risk Assessment
+## Simulated Feature Importance
 
-IDRIS generates two TCFD risk flags per project:
+```{python}
+#| label: fig-feature-importance
+#| fig-cap: "Simulated XGBoost feature importance — social dimensions dominate, confirming weight design"
 
-**Physical risk** is derived from the ND-GAIN Climate Vulnerability Index for the country
-of operation. Low: vulnerability < 0.40. Medium: 0.40–0.65. High: > 0.65.
+fig, ax = plt.subplots(figsize=(10, 5))
 
-**Transition risk** is derived from sector classification. High-transition sectors
-(Extractive Industry, Manufacturing, Food & Nutrition, Private Equity diversified) face
-significant regulatory and market disruption risk under 1.5°C–2°C pathways. Low-
-transition sectors (Renewable Energy, Energy Efficiency, Clean Transportation, Circular
-Economy, Biodiversity) are net beneficiaries of the transition.
+features = list(DIM_LABELS.values()) + ["Country CPI", "Sector Risk", "Log(Investment Size)"]
+importance = [0.18, 0.06, 0.22, 0.16, 0.05, 0.13, 0.07, 0.03, 0.04, 0.03, 0.03]
 
-### CSRD / ESRS Double Materiality
+sorted_pairs = sorted(zip(features, importance), key=lambda x: x[1])
+features_sorted = [p[0] for p in sorted_pairs]
+importance_sorted = [p[1] for p in sorted_pairs]
 
-Following the 2025 Omnibus revision, CSRD applies to companies with > 1,000 employees
-and > €450M turnover. IDRIS applies a proxy rule: projects with investment > €5M in
-EU jurisdictions outside financial inclusion sectors are flagged as likely in-scope for
-CSRD reporting by the investee company.
+colors = []
+social_dims = {"Gender & Social Equity", "Social Mobility", "Governance & Corruption"}
+for f in features_sorted:
+    if f in social_dims:
+        colors.append(C["social"])
+    elif f in {"Climate & Environment", "Pollution & Health", "Water & Resources"}:
+        colors.append(C["accent"])
+    else:
+        colors.append(C["muted"])
 
-Double materiality flags are generated for impact materiality (does the activity have
-significant environmental or social impacts?) and financial materiality (are
-sustainability risks material to the financial performance of the investment?).
+bars = ax.barh(features_sorted, importance_sorted, color=colors, edgecolor='white', linewidth=0.5, height=0.65)
+for bar, val in zip(bars, importance_sorted):
+    ax.text(bar.get_width() + 0.003, bar.get_y() + bar.get_height()/2,
+            f"{val:.0%}", va='center', fontsize=9, fontweight='bold', color=C["primary"])
 
-### PRIIPs / MiFID II Suitability
+style_plot(ax, title="XGBoost Feature Importance (Simulated)", xlabel="Relative Importance")
 
-IDRIS generates a MiFID II suitability score (0–10) for each project, combining the
-IDRIS composite score, SFDR article classification and TCFD risk flags. This feeds
-directly into investor preference matching under MiFID II Article 9(1)(a) sustainability
-preference assessment, enabling portfolio-level suitability reporting.
-
----
-
-## Score Bands and Decision Framework
-
-```{=html}
-<div class="band-table-wrap">
-  <table class="band-table">
-    <thead>
-      <tr>
-        <th>Band</th><th>Score range</th>
-        <th>Recommended SFDR</th><th>Decision guidance</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="band-dg">
-        <td><span class="band-pill band-dg-pill">Dark Green</span></td>
-        <td>75 – 100</td><td>Article 9</td>
-        <td>Flagship impact investment. Full Taxonomy alignment typically achieved.
-        Suitable for Article 9 product eligibility.</td>
-      </tr>
-      <tr class="band-g">
-        <td><span class="band-pill band-g-pill">Green</span></td>
-        <td>58 – 74</td><td>Article 8</td>
-        <td>Strong impact profile. Promotes E/S characteristics. Article 8 product
-        eligible with documented E/S binding elements.</td>
-      </tr>
-      <tr class="band-a">
-        <td><span class="band-pill band-a-pill">Amber</span></td>
-        <td>40 – 57</td><td>Article 6 or 8</td>
-        <td>Mixed profile. Review dimension weaknesses. Social veto may be active.
-        Additional due diligence recommended before classification.</td>
-      </tr>
-      <tr class="band-r">
-        <td><span class="band-pill band-r-pill">Red</span></td>
-        <td>0 – 39</td><td>Article 6</td>
-        <td>Significant adverse impacts identified. Not suitable for impact mandate.
-        Investment should be declined or substantially restructured.</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+from matplotlib.patches import Patch
+legend_elements = [
+    Patch(facecolor=C["social"], label='Social (51%)'),
+    Patch(facecolor=C["accent"], label='Environmental (31%)'),
+    Patch(facecolor=C["muted"], label='Metadata / Economic (18%)'),
+]
+ax.legend(handles=legend_elements, loc='lower right', frameon=True, fontsize=9)
+plt.tight_layout()
+plt.show()
 ```
 
 ---
 
-## Country and Sector Reference Data
+# Data Sources
 
-### Country Context Indices
+## Public / Open Data Sources
 
-Country calibration data is sourced from three publicly available, annually-updated indices:
+| Source | Data Provided | Coverage | Frequency | Access |
+|:---|:---|:---|:---|:---|
+| **Transparency International CPI** | Country corruption perception index (0-100) | 180 countries | Annual | Free |
+| **World Bank Open Data** | GDP per capita, Gini, electricity access, education enrollment | 217 countries | Annual | Free |
+| **ILO STAT** | Gender pay gap, labour force participation, working conditions | 189 countries | Annual | Free |
+| **UNDP HDI** | Human Development Index, gender inequality index | 191 countries | Annual | Free |
+| **ND-GAIN Index** | Climate vulnerability and readiness scores | 185 countries | Annual | Free |
+| **EU Taxonomy Compass** | Taxonomy-eligible activities, technical screening criteria | EU | Ongoing | Free |
+| **EDGAR** (JRC) | GHG emission inventories by country and sector | Global | Annual | Free |
+| **Global Living Wage Coalition** | Living wage benchmarks by country/region | 35+ countries | Annual | Free |
+| **OECD DAC** | ODA flows, development finance statistics | 180+ countries | Annual | Free |
+| **OpenSanctions** | Sanctions lists, PEP data, enforcement actions | Global | Daily | Free |
+| **UN Comtrade** | International trade data (supply chain localisation proxy) | 200+ countries | Monthly | Free |
+| **Eurostat** | EU employment, energy, environment statistics | EU-27 | Quarterly | Free |
+| **SFDR PAI RTS Annex I** | 18 mandatory PAI indicator definitions and methodologies | EU regulation | Regulatory | Free |
+| **ESMA/EBA Joint PAI Report** | Supervisory guidance on PAI indicator calculation | EU regulation | Annual | Free |
 
-- **Transparency International Corruption Perceptions Index (CPI)** — used in governance
-  and gender dimension scoring. Scores range 0–100 (0=highly corrupt, 100=very clean).
-  2023 data.
-- **Notre Dame Global Adaptation Initiative (ND-GAIN) Climate Vulnerability Index** —
-  used in climate and water dimension scoring and TCFD physical risk classification.
-  Scores range 0–1 (0=low vulnerability, 1=high vulnerability). 2022 data.
-- **UNDP Human Development Index (HDI)** — used in social mobility, gender, territory
-  and innovation dimension scoring. Scores range 0–1 (0=low development, 1=very high
-  development). 2023 data.
+: Public / Open Data Sources {.striped}
 
-The framework covers 50 countries spanning all major investment geographies. For unlisted
-countries, a conservative default (CPI=45, Vuln=0.50, HDI=0.70) is applied.
+## Proprietary / Commercial Data Sources
 
-### Sector Taxonomy Eligibility
+| Source | Data Provided | Use Case | Approx. Cost/yr |
+|:---|:---|:---|:---|
+| **MSCI ESG** | ESG ratings, carbon data, PAI metrics, controversy scores | Benchmark calibration, PAI pre-fill | EUR 30k-100k |
+| **Sustainalytics** | ESG risk ratings, carbon emissions, PAI indicators | Cross-validation | EUR 25k-80k |
+| **CDP** | Corporate climate disclosures, water security, forests | Climate & water enrichment | EUR 5k-20k |
+| **Refinitiv ESG** | 630+ ESG metrics, controversies, carbon data | Large-cap coverage | EUR 20k-60k |
+| **Bloomberg ESG** | ESG scores, supply chain data, governance metrics | Terminal-integrated scoring | Bloomberg Terminal |
+| **Preqin** | PE/VC fund data, impact fund benchmarks | Private market calibration | EUR 15k-50k |
+| **S&P Trucost** | Environmental cost data, carbon earnings at risk | Pollution & climate dimensions | EUR 20k-40k |
+| **RepRisk** | ESG risk incidents, controversy tracking | Governance & corruption alerts | EUR 10k-30k |
+| **Clarity AI** | Impact measurement, SDG alignment, PAI automation | Full PAI dashboard pre-fill | Custom |
+| **Moody's ESG** | Climate risk, physical risk, transition risk scoring | TCFD compliance layer | EUR 15k-45k |
 
-```{=html}
-<div class="sector-table-wrap">
-  <table class="sector-table">
-    <thead>
-      <tr><th>Sector</th><th>Taxonomy eligible</th><th>GHG intensity</th><th>Social tier</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Renewable Energy</td><td class="yes">Yes</td><td class="low">Very low (0.05)</td><td class="mid">Medium</td></tr>
-      <tr><td>Energy Efficiency</td><td class="yes">Yes</td><td class="low">Low (0.10)</td><td class="mid">Medium</td></tr>
-      <tr><td>Water &amp; Sanitation</td><td class="yes">Yes</td><td class="low">Very low (0.08)</td><td class="high">High</td></tr>
-      <tr><td>Clean Transportation</td><td class="yes">Yes</td><td class="low">Low (0.15)</td><td class="mid">Medium</td></tr>
-      <tr><td>Green Building / Real Estate</td><td class="yes">Yes</td><td class="low">Low (0.20)</td><td class="mid">Medium</td></tr>
-      <tr><td>Circular Economy</td><td class="yes">Yes</td><td class="low">Low (0.18)</td><td class="mid">Medium</td></tr>
-      <tr><td>Biodiversity / Nature</td><td class="yes">Yes</td><td class="low">Very low (0.05)</td><td class="mid">Medium</td></tr>
-      <tr><td>Sustainable Agriculture</td><td class="yes">Yes</td><td class="med">Medium (0.35)</td><td class="high">High</td></tr>
-      <tr><td>Social Infrastructure</td><td class="yes">Yes</td><td class="low">Low (0.10)</td><td class="high">High</td></tr>
-      <tr><td>Healthcare</td><td class="no">No</td><td class="low">Low (0.22)</td><td class="high">High</td></tr>
-      <tr><td>Education &amp; Skills</td><td class="no">No</td><td class="low">Low (0.12)</td><td class="high">High</td></tr>
-      <tr><td>Financial Inclusion / Microfinance</td><td class="no">No</td><td class="low">Very low (0.10–0.15)</td><td class="high">High</td></tr>
-      <tr><td>Affordable Housing</td><td class="no">No</td><td class="low">Low (0.28)</td><td class="high">High</td></tr>
-      <tr><td>Digital Infrastructure</td><td class="no">No</td><td class="med">Medium (0.25)</td><td class="low-t">Low</td></tr>
-      <tr><td>SME Finance</td><td class="no">No</td><td class="med">Medium (0.30)</td><td class="mid">Medium</td></tr>
-      <tr><td>Food &amp; Nutrition</td><td class="no">No</td><td class="med">Medium-high (0.42)</td><td class="mid">Medium</td></tr>
-      <tr><td>Manufacturing (conventional)</td><td class="no">No</td><td class="high-t">High (0.65)</td><td class="low-t">Low</td></tr>
-      <tr><td>Extractive Industry</td><td class="no">No</td><td class="high-t">Very high (0.85)</td><td class="low-t">Low</td></tr>
-    </tbody>
-  </table>
-</div>
+: Proprietary / Commercial Data Sources {.striped}
+
+::: {.callout-note}
+**Danki v1.0 operates entirely on public data**. The scoring engine requires only country-level indicators (CPI, HDI, climate vulnerability) plus project-level inputs from the user. Proprietary sources are optional enrichments for Phase 3 ML calibration and automated PAI pre-fill.
+:::
+
+## Data Integration Architecture
+
+```{python}
+#| label: fig-data-sources
+#| fig-cap: "Data source integration — public sources provide the foundation, proprietary sources enrich"
+
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.axis('off')
+
+# Public sources (left)
+public_sources = [
+    "TI CPI", "World Bank", "ILO STAT", "UNDP HDI",
+    "ND-GAIN", "EU Taxonomy", "EDGAR", "OpenSanctions"
+]
+for i, src in enumerate(public_sources):
+    y = 0.90 - i * 0.10
+    rect = plt.Rectangle((0.02, y - 0.03), 0.18, 0.06, facecolor=C["accent"], alpha=0.15, edgecolor=C["accent"], linewidth=1)
+    ax.add_patch(rect)
+    ax.text(0.11, y, src, ha='center', va='center', fontsize=8, fontweight='bold', color=C["primary"])
+
+# Central engine
+rect = plt.Rectangle((0.35, 0.20), 0.30, 0.60, facecolor=C["primary"], alpha=0.08, edgecolor=C["primary"], linewidth=2)
+ax.add_patch(rect)
+ax.text(0.50, 0.50, "DANKI\nSCORING\nENGINE", ha='center', va='center', fontsize=14, fontweight='bold', color=C["primary"])
+ax.text(0.50, 0.35, "8 dimensions\nComposite index\nSocial veto", ha='center', va='center', fontsize=9, color=C["muted"])
+
+# Proprietary sources (right)
+prop_sources = [
+    "MSCI ESG", "Sustainalytics", "CDP", "Refinitiv",
+    "RepRisk", "Clarity AI"
+]
+for i, src in enumerate(prop_sources):
+    y = 0.85 - i * 0.10
+    rect = plt.Rectangle((0.80, y - 0.03), 0.18, 0.06, facecolor=C["social"], alpha=0.15, edgecolor=C["social"], linewidth=1)
+    ax.add_patch(rect)
+    ax.text(0.89, y, src, ha='center', va='center', fontsize=8, fontweight='bold', color=C["primary"])
+
+# Arrows
+for i in range(len(public_sources)):
+    y = 0.90 - i * 0.10
+    ax.annotate('', xy=(0.35, 0.50), xytext=(0.20, y),
+                arrowprops=dict(arrowstyle='->', color=C["accent"], lw=1, alpha=0.4))
+
+for i in range(len(prop_sources)):
+    y = 0.85 - i * 0.10
+    ax.annotate('', xy=(0.65, 0.50), xytext=(0.80, y),
+                arrowprops=dict(arrowstyle='->', color=C["social"], lw=1, alpha=0.4, linestyle='--'))
+
+# Labels
+ax.text(0.11, 0.98, "PUBLIC (Free)", ha='center', fontsize=11, fontweight='bold', color=C["accent"])
+ax.text(0.89, 0.98, "PROPRIETARY (Optional)", ha='center', fontsize=11, fontweight='bold', color=C["social"])
+
+ax.set_xlim(-0.02, 1.02)
+ax.set_ylim(0.10, 1.05)
+ax.set_title("Data Source Integration Architecture", fontsize=14, fontweight='bold', color=C["primary"], pad=15)
+plt.tight_layout()
+plt.show()
 ```
 
 ---
 
-## Validation and Benchmarking
+# Validation Statistics
 
-### Synthetic Dataset
+## Benchmark Dataset Summary
 
-The IDRIS framework was developed and validated against a synthetic benchmark dataset of
-2,000 investment projects generated using the `generate_data.py` module. The dataset
-covers all 50 countries, all 20 sectors, all 6 asset classes, and a log-uniform
-distribution of investment sizes from €1,500 to €50,000,000.
+The synthetic benchmark dataset contains 2,000 investment projects designed to stress-test the scoring engine across extreme conditions.
 
-**Dataset statistics (2,000 projects):**
+```{python}
+#| label: fig-validation-summary
+#| fig-cap: "Validation summary statistics across the benchmark dataset"
 
-| Metric | Value |
-|--------|-------|
-| IDRIS score range | 23.3 – 84.0 |
-| Mean IDRIS score | 58.5 |
-| Article 9 classification | 9.7% |
-| Article 8 classification | 70.4% |
-| Article 6 classification | 19.9% |
-| Taxonomy aligned | 40.1% |
-| Social veto triggered | 1.1% |
-| Dark Green band | 5.4% |
-| Green band | 50.2% |
-| Amber band | 37.6% |
-| Red band | 6.9% |
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
-### Score Coherence Checks
+# Panel 1: Key statistics
+ax = axes[0]
+ax.axis('off')
+stats = [
+    ("Projects", f"{len(df):,}"),
+    ("Countries", f"{df['country'].nunique()}"),
+    ("Sectors", f"{df['sector'].nunique()}"),
+    ("Score range", f"{df['danki_score'].min():.1f} - {df['danki_score'].max():.1f}"),
+    ("Mean score", f"{df['danki_score'].mean():.1f}"),
+    ("Std dev", f"{df['danki_score'].std():.1f}"),
+]
+for i, (label, value) in enumerate(stats):
+    y = 0.85 - i * 0.14
+    ax.text(0.05, y, label, fontsize=10, color=C["muted"], va='center')
+    ax.text(0.70, y, value, fontsize=11, fontweight='bold', color=C["primary"], va='center')
+ax.set_title("Dataset Overview", fontsize=12, fontweight='bold', color=C["primary"])
 
-Three properties of the scoring system were validated against prior expectations:
+# Panel 2: Asset class distribution
+ax2 = axes[1]
+if 'asset_class' in df.columns:
+    ac = df['asset_class'].value_counts()
+    ax2.barh(ac.index, ac.values, color=C["accent"], alpha=0.7, edgecolor='white')
+    style_plot(ax2, title="By Asset Class")
+    for i, (idx, val) in enumerate(ac.items()):
+        ax2.text(val + 2, i, str(val), va='center', fontsize=9, color=C["primary"])
 
-**Geographic ordering.** Nordic EU member states (Denmark, Sweden, Norway) consistently
-score highest; sub-Saharan Africa and South Asia score lowest on average. This reflects
-the CPI, HDI and climate vulnerability differentials across regions. The scoring
-correctly does *not* penalise low-HDI countries for having lower development scores — the
-territory dimension includes an additionality term that rewards investment in
-underserved geographies.
+# Panel 3: Investment size distribution
+ax3 = axes[2]
+if 'investment_eur' in df.columns:
+    ax3.hist(np.log10(df['investment_eur']), bins=30, color=C["accent"], alpha=0.7, edgecolor='white')
+    ax3.set_xlabel("log10(EUR)", fontsize=10, color=C["muted"])
+    style_plot(ax3, title="Investment Size Distribution")
 
-**Sector ordering.** Renewable Energy, Education and Microfinance score highest; Extractive
-Industry and conventional Manufacturing score lowest. The ordering is consistent across
-geographies — a renewable energy project in Nigeria scores higher than an extractive
-project in Denmark.
-
-**Social veto coherence.** The 22 veto-triggered projects in the dataset are exclusively
-in high-corruption, low-development geographies with extractive or low-social-factor
-sectors. No EU-member-state project triggers the veto. No social-sector project
-(healthcare, education, microfinance) triggers the veto in any geography.
-
----
-
-## Limitations and Future Development
-
-### Current Limitations
-
-**Sector granularity.** The current implementation uses 20 sector categories. Real-world
-projects often span multiple sectors or represent niche activities not well-captured by
-the taxonomy. Future versions will support multi-sector blending with user-defined
-sector weights.
-
-**Analyst data dependency.** The framework produces strongest results when analysts
-provide project-specific data (actual GHG intensity, measured gender pay gap,
-governance audit results). In the absence of such data, sector and country defaults are
-applied — these are calibrated to be conservative but cannot substitute for field
-due diligence.
-
-**Dynamic index updates.** CPI, HDI and ND-GAIN data are updated annually. The framework
-requires an annual recalibration of country reference data to remain current.
-
-**Social veto threshold calibration.** The 30/100 threshold for the Social Veto Rule was
-set by expert judgment and validated against the synthetic dataset. A formal empirical
-calibration against real investment outcomes data would strengthen its defensibility
-before regulators.
-
-### Roadmap
-
-- **v1.1:** Multi-sector blending, SFDR annex template auto-generation
-- **v1.2:** Integration with Bloomberg ESG, MSCI ESG and Sustainalytics data APIs
-- **v1.3:** Portfolio-level aggregation and fund-level SFDR entity reporting
-- **v2.0:** Machine learning calibration layer trained on verified impact outcomes data
-  from GIIN, IFC and development finance institutions
-
----
-
-## References
-
-1. European Commission (2020). *Regulation (EU) 2020/852 on the establishment of a
-   framework to facilitate sustainable investment (EU Taxonomy Regulation).*
-2. European Commission (2019). *Regulation (EU) 2019/2088 on sustainability-related
-   disclosures in the financial services sector (SFDR).*
-3. European Commission (2022). *Directive (EU) 2022/2464 on Corporate Sustainability
-   Reporting (CSRD).*
-4. European Commission (2022). *Directive (EU) 2022/2523 on Corporate Sustainability
-   Due Diligence (CSDDD).*
-5. TCFD (2017). *Recommendations of the Task Force on Climate-related Financial
-   Disclosures.* Financial Stability Board.
-6. Transparency International (2023). *Corruption Perceptions Index 2023.*
-7. UNDP (2023). *Human Development Report 2023/24.* United Nations Development Programme.
-8. University of Notre Dame (2022). *ND-GAIN Country Index.* Notre Dame Global
-   Adaptation Initiative.
-9. GIIN (2020). *IRIS+ System for Impact Measurement and Management.*
-   Global Impact Investing Network.
-10. IMP (2019). *A Guide to Classifying the Impact of an Investment.*
-    Impact Management Project.
-11. World Bank (2023). *Women, Business and the Law 2023.*
-12. ILO (2022). *World Employment and Social Outlook 2022.*
-    International Labour Organization.
-13. Allen, T. et al. (2016). *Social Mobility and Its Drivers.* OECD Publishing.
-14. Bridgespan Group (2021). *The State of Impact Measurement.*
-
----
-
-```{=html}
-<div class="report-footer">
-  <div class="report-footer-inner">
-    <div class="footer-brand">
-      <span class="footer-logo">Danki Studio</span>
-      <span class="footer-author">Nambona Adeline YANGUERE</span>
-    </div>
-    <div class="footer-sdgs">
-      <svg class="sdg-tile-sm" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"/><text x="50" y="42" font-family="Arial" font-size="32" font-weight="bold" fill="white" text-anchor="middle">2</text></svg>
-      <svg class="sdg-tile-sm" viewBox="0 0 100 100"><rect width="100" height="100" fill="#26BDE2"/><text x="50" y="42" font-family="Arial" font-size="32" font-weight="bold" fill="white" text-anchor="middle">6</text></svg>
-      <svg class="sdg-tile-sm" viewBox="0 0 100 100"><rect width="100" height="100" fill="#BF8B2E"/><text x="50" y="42" font-family="Arial" font-size="32" font-weight="bold" fill="white" text-anchor="middle">12</text></svg>
-      <svg class="sdg-tile-sm" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3F7E44"/><text x="50" y="42" font-family="Arial" font-size="32" font-weight="bold" fill="white" text-anchor="middle">13</text></svg>
-      <svg class="sdg-tile-sm" viewBox="0 0 100 100"><rect width="100" height="100" fill="#56C02B"/><text x="50" y="42" font-family="Arial" font-size="32" font-weight="bold" fill="white" text-anchor="middle">15</text></svg>
-    </div>
-    <div class="footer-disclaimer">
-      IDRIS v1.0 · This framework is provided for informational and due diligence support
-      purposes only. It does not constitute investment advice, legal advice or regulatory
-      guidance. Classification outputs should be reviewed by qualified compliance professionals
-      before use in regulated product disclosure.
-    </div>
-  </div>
-</div>
+plt.tight_layout()
+plt.show()
 ```
+
+## Scoring Engine Validation
+
+Three representative test cases demonstrate the engine produces economically coherent results:
+
+| Test Case | Country | Sector | Size | Danki Score | Band | SFDR | Veto |
+|:---|:---|:---|:---|:---:|:---|:---|:---|
+| Renewable energy | France | Solar PV | EUR 5M | 77.2 | Dark Green | Article 9 | No |
+| Extractive industry | Nigeria | Oil & Gas | EUR 250k | 28.7 | Red | Article 6 | No |
+| Microfinance | Bangladesh | Financial Inclusion | EUR 8k | 54.4 | Amber | Article 8 | No |
+| Digital infra (forced veto) | Nigeria | Telecoms | EUR 1M | 65.0 | Amber (capped) | Article 8 | **Yes — Gender** |
+
+: Validation Test Cases {.striped}
+
+---
+
+# Deployment
+
+## Technical Requirements
+
+- **Python 3.10+** with pandas, numpy, matplotlib
+- **Quarto 1.4+** for report rendering
+- **No database required** — the app runs entirely client-side in the browser
+
+## Installation & Build
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/danki-impact-scoring.git
+cd danki-impact-scoring
+
+# 2. Install Python dependencies
+pip install -r requirements.txt
+
+# 3. Generate the benchmark dataset (first time only)
+cd src
+python generate_data.py
+# -> data/processed/investment_impacts.csv (2,000 projects)
+
+# 4. Render the whitepaper
+cd ../report
+quarto render index.qmd --to html --output-dir ../docs
+
+# 5. Render the scoring app
+quarto render app.qmd --to html --output-dir ../docs
+
+# 6. Deploy to GitHub Pages
+quarto publish gh-pages
+```
+
+## Deployment Options
+
+| Option | Setup | Best For |
+|:---|:---|:---|
+| **GitHub Pages** | `quarto publish gh-pages` | Public demo, LP access |
+| **Internal server** | Copy `docs/` to any static file server | Analyst team, compliance |
+| **Offline** | Open `docs/app.html` directly in browser | Field due diligence |
+
+: Deployment Options {.striped}
+
+The scoring app is **fully static** — no server, no database, no API calls. All scoring logic runs in JavaScript in the user's browser. This means:
+
+- **Zero infrastructure cost**
+- **Works offline** for field due diligence in low-connectivity environments
+- **No data leaves the user's device** — important for pre-investment confidentiality
+- **Instant deployment** — any static hosting works (GitHub Pages, Netlify, S3, internal server)
+
+## Project Structure
+
+```
+danki-impact-scoring/
+|-- data/
+|   +-- processed/
+|       +-- investment_impacts.csv    <- 2,000-row benchmark dataset
+|-- docs/                             <- GitHub Pages output
+|   +-- assets/
+|-- notebooks/
+|   +-- eda_marimo.py                 <- exploratory analysis
+|-- report/
+|   |-- index.qmd                     <- this methodology whitepaper
+|   |-- app.qmd                       <- Danki scoring app
+|   +-- report-style.css              <- shared brand stylesheet
+|-- src/
+|   |-- generate_data.py              <- synthetic dataset generator
+|   |-- scoring.py                    <- composite scoring engine
+|   +-- viz.py                        <- chart functions
+|-- requirements.txt
+|-- _quarto.yml
++-- README.md
+```
+
+---
+
+# Limitations & Roadmap
+
+## Current Limitations (v1.0)
+
+1. **Synthetic data only**: The benchmark dataset is generated, not sourced from real investments. Dimension scores are calibrated to be realistic but are not validated against actual outcomes.
+2. **No temporal dimension**: Scores are point-in-time. Impact trajectories (improving vs. declining) are not captured.
+3. **Equal treatment of PAI indicators**: All 18 mandatory PAI indicators are tracked but not differentially weighted within their parent dimensions.
+4. **No automated data ingestion**: Users manually input project data. API connections to data providers are not yet implemented.
+5. **ML layer is simulated**: The XGBoost calibration layer is designed but not yet trained on validated data.
+
+## Roadmap
+
+| Phase | Deliverable | Timeline |
+|:---|:---|:---|
+| **Phase 1** (complete) | Scoring engine, whitepaper, interactive app, synthetic benchmark | Q1 2025 |
+| **Phase 2** | Real investment data onboarding, expert validation of dimension scores | Q2 2025 |
+| **Phase 3** | XGBoost calibration layer with SHAP explainability | Q3 2025 |
+| **Phase 4** | API connections to public data sources (TI CPI, World Bank, ND-GAIN) | Q3 2025 |
+| **Phase 5** | Proprietary data integration (MSCI, CDP, RepRisk) | Q4 2025 |
+| **Phase 6** | Portfolio-level scoring (aggregate multiple projects into fund-level impact) | Q1 2026 |
+| **Phase 7** | Temporal impact tracking and trajectory scoring | Q2 2026 |
+
+: Development Roadmap {.striped}
+
+---
+
+# References
+
+1. **EU Taxonomy Regulation** (2020/852) — Official Journal of the European Union
+2. **SFDR** (2019/2088) — Regulation on sustainability-related disclosures in the financial services sector
+3. **CSRD** (2022/2464) — Corporate Sustainability Reporting Directive
+4. **CSDDD** (2024/1760) — Corporate Sustainability Due Diligence Directive
+5. **TCFD Recommendations** (2017) — Task Force on Climate-related Financial Disclosures, FSB
+6. **MiFID II** (2014/65/EU) — Markets in Financial Instruments Directive, as amended for sustainability preferences
+7. **ESMA/EBA** Joint Report on PAI (JC 2024/68, October 2024) — Principal Adverse Impact disclosures
+8. **EU Omnibus Simplification Package** (December 2025) — CSRD scope narrowing to 1,000+ employees / EUR 450M turnover
+9. **MSCI SFDR Adverse Impact Metrics Methodology** (2024) — PAI calculation standards
+10. **Transparency International CPI** (2024) — Corruption Perceptions Index methodology
+11. **UNDP Human Development Report** (2024) — HDI and Gender Inequality Index
+12. **ND-GAIN Country Index** (2024) — Climate vulnerability and readiness
+13. **GIIN** — Global Impact Investing Network, Annual Impact Investor Survey (2024)
+14. **IMP** — Impact Management Project, Five Dimensions of Impact framework
+15. **IFC Performance Standards** (2012) — Environmental and Social Sustainability
+16. **OECD Guidelines for Multinational Enterprises** (2023 update) — Responsible business conduct
+
+---
+
+::: {.doc-footer}
+**Danki Impact Scoring** v1.0 · Methodology Whitepaper
+Designed for impact investors who refuse to confuse compliance with change.
+:::

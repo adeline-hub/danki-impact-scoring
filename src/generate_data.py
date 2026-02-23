@@ -1,5 +1,5 @@
 """
-IDRIS — Impact & Due Diligence Risk Intelligence Scoring
+Danki Impact Scoring
 =========================================================
 Synthetic investment dataset generator.
 
@@ -11,7 +11,7 @@ Produces 2,000 realistic investment project records across:
   - 8 impact dimensions (Climate, Water, Gender, Social Mobility,
     Territory, Governance/Corruption, Pollution, Innovation)
   - 18 SFDR mandatory PAI indicators
-  - Composite IDRIS score (0–100) with ML calibration layer
+  - Composite danki score (0–100) with ML calibration layer
 
 Ground-truth scoring logic:
   - Weighted composite index (regulator-friendly, fully explainable)
@@ -20,7 +20,7 @@ Ground-truth scoring logic:
      UNDP HDI, World Bank Doing Business successor)
   - Investment size non-linearity (log-scale normalisation)
 
-Author : Nambona Adeline YANGUERE / Danki Studio
+Author : Nambona YANGUERE / Danki Studio
 """
 
 import numpy as np
@@ -250,8 +250,8 @@ def score_innovation(sector_key, size_factor, hdi):
     return clamp(base / 100) * 100
 
 
-def compute_idris_score(dims: dict) -> float:
-    """Weighted composite IDRIS score (0–100)."""
+def compute_danki_score(dims: dict) -> float:
+    """Weighted composite danki score (0–100)."""
     return sum(DIMENSION_WEIGHTS[k] * dims[k] for k in DIMENSION_WEIGHTS)
 
 
@@ -259,7 +259,7 @@ def compute_idris_score(dims: dict) -> float:
 # 4. REGULATORY FRAMEWORK LOGIC
 # ─────────────────────────────────────────────────────────────
 
-def taxonomy_alignment(sector_key, ghg_factor, climate_vuln, idris_score):
+def taxonomy_alignment(sector_key, ghg_factor, climate_vuln, danki_score):
     """
     Returns (eligible, aligned, dnsh_pass, substantial_contribution_score).
     EU Taxonomy: Substantial Contribution to ≥1 of 6 env. objectives + DNSH.
@@ -269,7 +269,7 @@ def taxonomy_alignment(sector_key, ghg_factor, climate_vuln, idris_score):
         return False, False, False, 0.0
 
     # Substantial contribution proxy
-    sc_score = clamp((1 - ghg_factor) * 0.6 + (idris_score / 100) * 0.4)
+    sc_score = clamp((1 - ghg_factor) * 0.6 + (danki_score / 100) * 0.4)
 
     # DNSH: Do No Significant Harm — fails if GHG too high OR climate too vulnerable
     dnsh_pass = (ghg_factor < 0.50) and (climate_vuln < 0.70)
@@ -278,16 +278,16 @@ def taxonomy_alignment(sector_key, ghg_factor, climate_vuln, idris_score):
     return eligible, aligned, dnsh_pass, round(sc_score * 100, 1)
 
 
-def sfdr_classification(idris_score, taxonomy_aligned, pai_score, governance_score):
+def sfdr_classification(danki_score, taxonomy_aligned, pai_score, governance_score):
     """
     Infer SFDR article classification.
     Art. 9: highest bar — sustainable investment objective + Taxonomy alignment
     Art. 8: E/S characteristics promoted + PAI consideration
     Art. 6: no specific sustainability claims
     """
-    if taxonomy_aligned and idris_score >= 72 and pai_score >= 70:
+    if taxonomy_aligned and danki_score >= 72 and pai_score >= 70:
         return "Article 9"
-    elif idris_score >= 50 and pai_score >= 50:
+    elif danki_score >= 50 and pai_score >= 50:
         return "Article 8"
     else:
         return "Article 6"
@@ -337,12 +337,12 @@ def pai_score(ghg_factor, gender_factor, cpi, climate_vuln, governance_score):
     return round(np.mean(scores), 1)
 
 
-def mifid_suitability(idris_score, sfdr_art, tcfd_physical, tcfd_transition):
+def mifid_suitability(danki_score, sfdr_art, tcfd_physical, tcfd_transition):
     """
     PRIIPs / MiFID II sustainability suitability flag.
     Returns suitability_score (0–10) and investor_profile.
     """
-    base = idris_score / 10
+    base = danki_score / 10
     if sfdr_art == "Article 9":
         base = min(base + 1.5, 10)
     elif sfdr_art == "Article 8":
@@ -383,7 +383,7 @@ def csrd_materiality(size_factor, sector_key, eu_member, investment_eur):
 # 5. DATASET GENERATOR
 # ─────────────────────────────────────────────────────────────
 
-def generate_idris_data(n: int = 2000) -> pd.DataFrame:
+def generate_danki_data(n: int = 2000) -> pd.DataFrame:
     country_list = list(COUNTRIES.keys())
     sector_list  = list(SECTORS.keys())
 
@@ -424,26 +424,26 @@ def generate_idris_data(n: int = 2000) -> pd.DataFrame:
         # Clamp all dimensions to [0, 100]
         dims = {k: clamp(v, 0, 100) for k, v in dims.items()}
 
-        idris = round(compute_idris_score(dims), 2)
+        danki = round(compute_danki_score(dims), 2)
 
         # ── Regulatory framework outputs ──────────────────────
         tax_elig_f, tax_aligned, dnsh_pass, sc_score = taxonomy_alignment(
-            sector, ghg_factor, vuln, idris
+            sector, ghg_factor, vuln, danki
         )
         p_score    = pai_score(ghg_factor, gender_factor, cpi, vuln, dims["governance"])
-        sfdr_art   = sfdr_classification(idris, tax_aligned, p_score, dims["governance"])
+        sfdr_art   = sfdr_classification(danki, tax_aligned, p_score, dims["governance"])
         phys_risk, trans_risk = tcfd_risk(vuln, ghg_factor, sector)
-        mifid_s, mifid_prof  = mifid_suitability(idris, sfdr_art, phys_risk, trans_risk)
+        mifid_s, mifid_prof  = mifid_suitability(danki, sfdr_art, phys_risk, trans_risk)
         csrd_scope, imp_mat, fin_mat = csrd_materiality(
             size_factor, sector, eu_member, investment_eur
         )
 
-        # ── IDRIS band ────────────────────────────────────────
-        if idris >= 75:
+        # ── danki band ────────────────────────────────────────
+        if danki >= 75:
             band = "Dark Green"
-        elif idris >= 58:
+        elif danki >= 58:
             band = "Green"
-        elif idris >= 40:
+        elif danki >= 40:
             band = "Amber"
         else:
             band = "Red"
@@ -487,8 +487,8 @@ def generate_idris_data(n: int = 2000) -> pd.DataFrame:
             "dim_innovation":    round(dims["innovation"], 1),
 
             # Composite score
-            "idris_score":       idris,
-            "idris_band":        band,
+            "danki_score":       danki,
+            "danki_band":        band,
 
             # EU Taxonomy
             "taxonomy_eligible": tax_elig_f,
@@ -523,8 +523,8 @@ def generate_idris_data(n: int = 2000) -> pd.DataFrame:
 # ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Generating IDRIS synthetic dataset (n=2,000)...")
-    df = generate_idris_data(2000)
+    print("Generating danki synthetic dataset (n=2,000)...")
+    df = generate_danki_data(2000)
 
     out = Path(__file__).parent.parent / "data" / "processed"
     out.mkdir(parents=True, exist_ok=True)
@@ -533,9 +533,9 @@ if __name__ == "__main__":
 
     print(f"Saved to {out}/investment_impacts.parquet")
     print(f"\nDataset shape : {df.shape}")
-    print(f"IDRIS range   : {df.idris_score.min():.1f} – {df.idris_score.max():.1f}")
-    print(f"Mean score    : {df.idris_score.mean():.1f}")
+    print(f"danki range   : {df.danki_score.min():.1f} – {df.danki_score.max():.1f}")
+    print(f"Mean score    : {df.danki_score.mean():.1f}")
     print(f"\nSFDR breakdown:\n{df.sfdr_article.value_counts()}")
-    print(f"\nIDRIS bands:\n{df.idris_band.value_counts()}")
+    print(f"\ndanki bands:\n{df.danki_band.value_counts()}")
     print(f"\nTaxonomy aligned: {df.taxonomy_aligned.sum()} / {len(df)}")
-    print(f"\nCountry sample:\n{df.groupby('country')['idris_score'].mean().sort_values().head(10)}")
+    print(f"\nCountry sample:\n{df.groupby('country')['danki_score'].mean().sort_values().head(10)}")

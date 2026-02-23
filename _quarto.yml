@@ -1,18 +1,15 @@
 project:
   type: website
   output-dir: docs
-  resources:
-    - assets/
 
 website:
-  title: "IDRIS — Impact Due Diligence Intelligence Scoring"
-  favicon: assets/favicon.ico
+  title: "Danki Impact Scoring"
   navbar:
     left:
-      - text: "Methodology Report"
-        href: index.html
+      - text: "Methodology"
+        href: report/index.qmd
       - text: "Scoring App"
-        href: app.html
+        href: report/app.qmd
     right:
       - text: "Danki Studio"
         href: "https://dankistudio.com"
@@ -20,13 +17,5 @@ website:
 format:
   html:
     theme: cosmo
+    css: report/report-style.css
     toc: true
-    number-sections: true
-    code-fold: true
-    fig-format: png
-    fig-dpi: 150
-
-execute:
-  echo: false
-  warning: false
-  message: false
