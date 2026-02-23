@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>IDRIS Scoring App – IDRIS — Impact Due Diligence Intelligence Scoring</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../assets/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-d4d76bf8491c20bad77d141916dc28e1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ddd961a2510921635943dfbbd19534c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">IDRIS — Impact Due Diligence Intelligence Scoring</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Methodology Report</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../app.html"> 
+<span class="menu-text">Scoring App</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://dankistudio.com"> 
+<span class="menu-text">Danki Studio</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">IDRIS Scoring App</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&amp;family=DM+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --mint:#33FFA2;--magenta:#FF33FF;--grey:#737373;
+  --bg:#F7F7F5;--surface:#FFFFFF;--border:#E5E5E5;--border-strong:#D0D0D0;
+  --ink:#1A1A1A;--ink-2:#3D3D3D;--ink-3:#737373;
+  --mint-d:#00CC7A;--mag-d:#CC00CC;
+  --dg:#1a6b3a;--green:#33AA66;--amber:#E8A020;--red:#CC3333;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ── TOP BAR ── */
+.top-bar{border-bottom:1px solid var(--border);padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:var(--surface);position:sticky;top:0;z-index:100}
+.top-bar-left{display:flex;align-items:center;gap:.75rem}
+.top-logo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;background:linear-gradient(90deg,var(--mint),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.top-divider{width:1px;height:18px;background:var(--border-strong)}
+.top-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.sdg-strip{display:flex;align-items:center;gap:.4rem}
+.sdg-ico{width:26px;height:26px;border-radius:3px}
+
+/* ── LAYOUT ── */
+.app-wrap{max-width:1140px;margin:0 auto;padding:0 1.5rem 5rem}
+
+/* ── HEADER ── */
+.app-header{text-align:center;padding:2.5rem 0 3rem;animation:fadeDown .5s ease both}
+.header-eyebrow{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1rem;display:block}
+.app-header h1{font-family:'Fraunces',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;letter-spacing:-.02em;line-height:1.05;color:var(--ink);margin-bottom:.9rem}
+.app-header h1 em{font-style:italic;font-weight:300;background:linear-gradient(90deg,var(--mint),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.app-header p{color:var(--ink-3);font-size:.9rem;max-width:540px;margin:0 auto;line-height:1.75}
+
+/* ── GRID ── */
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start;margin-bottom:1.25rem}
+@media(max-width:760px){.input-grid{grid-template-columns:1fr}}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start}
+@media(max-width:760px){.results-grid{grid-template-columns:1fr}}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;box-shadow:var(--shadow);position:relative;overflow:hidden;animation:fadeUp .5s ease both}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--mint),transparent)}
+.card.card-mag::before{background:linear-gradient(90deg,var(--magenta),transparent)}
+.card.card-full{grid-column:1/-1}
+.card-title{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1.4rem}
+.card-score-hero{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem}
+
+/* ── FORM ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:.875rem}
+.form-row.full{grid-template-columns:1fr}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.35rem}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border-strong);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:.85rem;padding:.52rem .8rem;transition:border-color .15s;appearance:none}
+.field input:focus,.field select:focus{outline:none;border-color:var(--mint-d);box-shadow:0 0 0 3px rgba(51,255,162,.1)}
+.field select option{background:var(--surface)}
+.field input[type="range"]{padding:0;height:3px;background:var(--border);border:none;cursor:pointer;accent-color:var(--mint-d);border-radius:100px}
+.range-row{display:flex;align-items:center;gap:.75rem}
+.range-val{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ink);min-width:3.5rem;text-align:right;font-weight:500}
+.sep{height:1px;background:var(--border);margin:1.25rem 0}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint-d);margin-bottom:.75rem;display:block}
+
+/* ── CALC BUTTON ── */
+.calc-btn{width:100%;padding:.875rem;margin-top:1.25rem;background:var(--ink);border:none;border-radius:8px;color:white;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:all .2s}
+.calc-btn:hover{background:var(--ink-2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+
+/* ── SCORE HERO ── */
+.score-hero-wrap{text-align:center;padding:1.5rem 0 1rem}
+.score-number{font-family:'Fraunces',serif;font-size:5rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.score-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:.3rem}
+.band-pill-lg{display:inline-block;padding:.4rem 1.2rem;border-radius:100px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:600;letter-spacing:.08em;margin-top:.75rem}
+.band-dg{background:var(--dg);color:white}
+.band-g {background:var(--green);color:white}
+.band-a {background:var(--amber);color:white}
+.band-r {background:var(--red);  color:white}
+.veto-banner{background:rgba(255,51,255,.06);border:1px solid rgba(255,51,255,.3);border-radius:8px;padding:.75rem 1rem;margin-top:1rem;font-size:.78rem;color:var(--mag-d);line-height:1.6}
+.veto-banner strong{color:var(--magenta)}
+
+/* ── RADAR CHART ── */
+#radarCanvas{display:block;margin:0 auto;max-width:100%}
+
+/* ── DIM BARS ── */
+.dim-bars{display:flex;flex-direction:column;gap:.7rem}
+.dim-row{display:grid;grid-template-columns:130px 1fr 40px;align-items:center;gap:.75rem}
+.dim-name{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.05em;color:var(--ink-2)}
+.dim-track{height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+.dim-fill{height:100%;border-radius:100px;transition:width .7s cubic-bezier(.16,1,.3,1)}
+.dim-val{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-3);text-align:right}
+
+/* ── REGULATORY GRID ── */
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:500px){.reg-grid{grid-template-columns:1fr}}
+.reg-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem}
+.reg-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.35rem}
+.reg-value{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
+.reg-sub{font-size:.72rem;color:var(--ink-3);margin-top:.2rem;line-height:1.5}
+.status-pass{color:var(--dg);font-weight:600}
+.status-fail{color:var(--red);font-weight:600}
+.status-med {color:var(--amber);font-weight:600}
+.tcfd-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem}
+.tcfd-pill{font-family:'DM Mono',monospace;font-size:.62rem;padding:.2rem .55rem;border-radius:4px}
+.tcfd-low {background:rgba(26,107,58,.1); color:var(--dg)}
+.tcfd-med {background:rgba(232,160,32,.1);color:#8a5500}
+.tcfd-high{background:rgba(204,51,51,.1); color:var(--red)}
+
+/* ── PAI TABLE ── */
+.pai-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:500px){.pai-grid{grid-template-columns:1fr}}
+.pai-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.pai-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pai-dot-g{background:var(--green)}
+.pai-dot-a{background:var(--amber)}
+.pai-dot-r{background:var(--red)}
+.pai-text{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--ink-2)}
+.pai-score-val{margin-left:auto;font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;color:var(--ink-3)}
+
+/* ── FLAGS ── */
+.flags-col{display:flex;flex-direction:column;gap:.5rem}
+.flag-item{padding:.65rem .9rem;border-radius:8px;font-size:.78rem;line-height:1.6}
+.flag-warn{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);color:#7a4f00}
+.flag-warn strong{color:var(--amber)}
+.flag-strength{background:rgba(51,170,102,.08);border:1px solid rgba(51,170,102,.3);color:#1a4d2e}
+.flag-strength strong{color:var(--dg)}
+
+/* ── SFDR RECOMMENDATION ── */
+.sfdr-rec{border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem;border:1px solid var(--border)}
+.sfdr-rec.art9{background:rgba(26,107,58,.06);border-left:4px solid var(--dg)}
+.sfdr-rec.art8{background:rgba(51,170,102,.06);border-left:4px solid var(--green)}
+.sfdr-rec.art6{background:rgba(115,115,115,.06);border-left:4px solid var(--grey)}
+.sfdr-art-num{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.3rem}
+.sfdr-art-name{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
+.sfdr-art-desc{font-size:.8rem;color:var(--ink-3);margin-top:.35rem;line-height:1.6}
+
+/* ── PDF BUTTON ── */
+.pdf-btn{width:100%;padding:.8rem;margin-top:1.25rem;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;color:var(--ink-2);font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;letter-spacing:.06em;cursor:pointer;transition:all .18s;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.pdf-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.pdf-btn:disabled{opacity:.4;cursor:wait}
+
+/* ── HIDDEN ── */
+.results-hidden{display:none}
+
+/* ── FOOTER ── */
+.app-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-left{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.footer-sdgs{display:flex;gap:.4rem;align-items:center}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+
+
+
+<!-- TOP BAR -->
+<nav class="top-bar">
+  <div class="top-bar-left">
+    <span class="top-logo">IDRIS</span>
+    <div class="top-divider"></div>
+    <span class="top-label">Impact Due Diligence Scoring · v1.0</span>
+  </div>
+  <div class="sdg-strip">
+    <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">2</text></svg>
+    <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#26BDE2"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">6</text></svg>
+    <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#BF8B2E"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">12</text></svg>
+    <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#3F7E44"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">13</text></svg>
+    <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#56C02B"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">15</text></svg>
+  </div>
+</nav>
+
+<div class="app-wrap">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <span class="header-eyebrow">Impact &amp; Due Diligence Risk Intelligence Scoring</span>
+    <h1>Project Impact<br><em>Assessment</em></h1>
+    <p>Enter project parameters to receive a composite IDRIS score, regulatory
+    framework classification and full impact dimension breakdown.</p>
+  </header>
+
+  <!-- INPUT GRID -->
+  <div class="input-grid">
+    <!-- PROJECT DETAILS -->
+    <div class="card">
+      <div class="card-title">01 — Project Identification</div>
+      <div class="form-row full">
+        <div class="field"><label>Project name</label>
+          <input type="text" id="projectName" value="New Investment Project" placeholder="Enter project name"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Country of operation</label>
+          <select id="country">
+            <optgroup label="EU Member States">
+              <option value="France">France</option><option value="Germany">Germany</option>
+              <option value="Netherlands">Netherlands</option><option value="Spain">Spain</option>
+              <option value="Italy">Italy</option><option value="Poland">Poland</option>
+              <option value="Romania">Romania</option><option value="Portugal">Portugal</option>
+              <option value="Sweden">Sweden</option><option value="Denmark">Denmark</option>
+              <option value="Belgium">Belgium</option><option value="Austria">Austria</option>
+              <option value="Czech Republic">Czech Republic</option><option value="Hungary">Hungary</option>
+              <option value="Greece">Greece</option>
+            </optgroup>
+            <optgroup label="Europe (non-EU)">
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Switzerland">Switzerland</option><option value="Norway">Norway</option>
+              <option value="Turkey">Turkey</option><option value="Ukraine">Ukraine</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="United States">United States</option><option value="Canada">Canada</option>
+              <option value="Brazil">Brazil</option><option value="Mexico">Mexico</option>
+              <option value="Chile">Chile</option><option value="Colombia">Colombia</option>
+              <option value="Argentina">Argentina</option><option value="Peru">Peru</option>
+            </optgroup>
+            <optgroup label="Africa">
+              <option value="Morocco">Morocco</option><option value="Senegal">Senegal</option>
+              <option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option>
+              <option value="South Africa">South Africa</option><option value="Ghana">Ghana</option>
+              <option value="Ethiopia">Ethiopia</option>
+            </optgroup>
+            <optgroup label="Asia &amp; Pacific">
+              <option value="India">India</option><option value="Bangladesh">Bangladesh</option>
+              <option value="Vietnam">Vietnam</option><option value="Indonesia">Indonesia</option>
+              <option value="Philippines">Philippines</option><option value="Japan">Japan</option>
+              <option value="South Korea">South Korea</option><option value="Australia">Australia</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="Other / Unknown">Other / Unknown</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field"><label>Asset class</label>
+          <select id="assetClass">
+            <option value="Private Equity / Venture">Private Equity / Venture</option>
+            <option value="Project Finance">Project Finance</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="SME Debt">SME Debt</option>
+            <option value="Green Bond" selected="">Green Bond</option>
+            <option value="Microfinance / Social Bond">Microfinance / Social Bond</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Sector</label>
+          <select id="sector">
+            <optgroup label="Taxonomy Eligible">
+              <option value="Renewable Energy" selected="">Renewable Energy</option>
+              <option value="Energy Efficiency">Energy Efficiency</option>
+              <option value="Water &amp; Sanitation">Water &amp; Sanitation</option>
+              <option value="Clean Transportation">Clean Transportation</option>
+              <option value="Green Building / Real Estate">Green Building / Real Estate</option>
+              <option value="Circular Economy">Circular Economy</option>
+              <option value="Biodiversity / Nature">Biodiversity / Nature</option>
+              <option value="Sustainable Agriculture">Sustainable Agriculture</option>
+              <option value="Social Infrastructure">Social Infrastructure</option>
+            </optgroup>
+            <optgroup label="Non-Taxonomy">
+              <option value="Healthcare">Healthcare</option>
+              <option value="Education &amp; Skills">Education &amp; Skills</option>
+              <option value="Financial Inclusion">Financial Inclusion</option>
+              <option value="Microfinance">Microfinance</option>
+              <option value="Affordable Housing">Affordable Housing</option>
+              <option value="Digital Infrastructure">Digital Infrastructure</option>
+              <option value="SME Finance">SME Finance</option>
+              <option value="Food &amp; Nutrition">Food &amp; Nutrition</option>
+              <option value="Private Equity (diversified)">Private Equity (diversified)</option>
+              <option value="Manufacturing (conventional)">Manufacturing (conventional)</option>
+              <option value="Extractive Industry">Extractive Industry</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field"><label>Investment size (€)</label>
+          <input type="number" id="investmentEur" value="2000000" min="1500" max="50000000" step="1000">
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPACT FACTORS -->
+    <div class="card card-mag">
+      <div class="card-title">02 — Impact Factors (optional overrides)</div>
+      <span class="section-label">Environmental</span>
+      <div class="form-row full"><div class="field"><label>GHG intensity override (0=very low, 1=very high)</label>
+        <div class="range-row">
+          <input type="range" id="ghg" min="0" max="1" step="0.01" value="0.10" oninput="document.getElementById('ghgVal').textContent=parseFloat(this.value).toFixed(2)">
+          <span class="range-val" id="ghgVal">0.10</span>
+        </div>
+      </div></div>
+      <div class="sep"></div>
+      <span class="section-label">Social</span>
+      <div class="form-row full"><div class="field"><label>Gender equity factor override (0=poor, 1=excellent)</label>
+        <div class="range-row">
+          <input type="range" id="genderF" min="0" max="1" step="0.01" value="0.60" oninput="document.getElementById('genderFVal').textContent=parseFloat(this.value).toFixed(2)">
+          <span class="range-val" id="genderFVal">0.60</span>
+        </div>
+      </div></div>
+      <div class="sep"></div>
+      <span class="section-label">Governance</span>
+      <div class="form-row full"><div class="field"><label>Governance score override (0=very poor, 100=excellent)</label>
+        <div class="range-row">
+          <input type="range" id="govOverride" min="0" max="100" step="1" value="-1" oninput="updateGovLabel(this)">
+          <span class="range-val" id="govVal">Auto</span>
+        </div>
+        <div style="font-size:.7rem;color:var(--ink-3);margin-top:.3rem">Set to 0 to use country default. Values 1–100 override the country CPI baseline.</div>
+      </div></div>
+      <div class="sep"></div>
+      <div style="font-size:.75rem;color:var(--ink-3);line-height:1.7;background:var(--bg);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
+        Leave at default to use sector and country benchmarks from the IDRIS reference database.
+        Override only when you have audited project-specific data.
+      </div>
+      <button class="calc-btn" onclick="calculate()">Run IDRIS Scoring</button>
+    </div>
+  </div>
+
+  <!-- RESULTS (hidden until calculated) -->
+  <div id="resultsWrap" class="results-hidden">
+
+    <!-- ROW 1: Score + Radar -->
+    <div class="results-grid" style="margin-bottom:1.25rem">
+
+      <!-- COMPOSITE SCORE -->
+      <div class="card" id="scoreCard">
+        <div class="card-title">03 — IDRIS Composite Score</div>
+        <div class="score-hero-wrap">
+          <div class="score-number" id="scoreNumber" style="color:var(--dg)">—</div>
+          <div class="score-label">out of 100</div>
+          <div><span class="band-pill-lg" id="bandPill">—</span></div>
+        </div>
+        <div id="vetoBanner" class="veto-banner" style="display:none">
+          <strong>Social Veto Triggered</strong><br>
+          <span id="vetoText"></span>
+        </div>
+        <div class="sep"></div>
+        <!-- SFDR Recommendation -->
+        <div id="sfdrRec" class="sfdr-rec art8">
+          <div class="sfdr-art-num">SFDR Recommended Classification</div>
+          <div class="sfdr-art-name" id="sfdrName">—</div>
+          <div class="sfdr-art-desc" id="sfdrDesc">—</div>
+        </div>
+        <!-- MiFID -->
+        <div style="display:flex;gap:.6rem;align-items:center;margin-top:.5rem">
+          <span style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">MiFID II Suitability:</span>
+          <span id="mifidScore" style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--ink)">—</span>
+          <span style="font-size:.72rem;color:var(--ink-3)">/10</span>
+        </div>
+        <div id="mifidProfile" style="font-size:.75rem;color:var(--ink-3);margin-top:.2rem;line-height:1.5"></div>
+        <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">
+          <svg width="13" height="13" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Due Diligence Report (PDF)
+        </button>
+      </div>
+
+      <!-- RADAR CHART -->
+      <div class="card">
+        <div class="card-title">04 — Impact Dimension Radar</div>
+        <canvas id="radarCanvas" width="340" height="340"></canvas>
+        <div class="dim-bars" id="dimBars" style="margin-top:1rem"></div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Regulatory + Flags -->
+    <div class="results-grid" style="margin-bottom:1.25rem">
+
+      <!-- REGULATORY GATE -->
+      <div class="card">
+        <div class="card-title">05 — Regulatory Framework Gate</div>
+        <div class="reg-grid" id="regGrid"></div>
+      </div>
+
+      <!-- PAI DASHBOARD -->
+      <div class="card card-mag">
+        <div class="card-title">06 — SFDR PAI Indicators</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--ink-3);margin-bottom:.8rem;letter-spacing:.06em">
+          PAI Aggregate Score: <span id="paiScoreVal" style="color:var(--ink);font-weight:500">—</span>/100
+        </div>
+        <div class="pai-grid" id="paiGrid"></div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Warnings + Strengths -->
+    <div class="card card-full" id="flagsCard">
+      <div class="card-title">07 — Due Diligence Flags</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:.6rem">Warnings</div>
+          <div class="flags-col" id="warnCol"></div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dg);margin-bottom:.6rem">Strengths</div>
+          <div class="flags-col" id="strengthCol"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /resultsWrap -->
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-left">IDRIS v1.0 · Danki Studio · Nambona Adeline YANGUERE</div>
+    <div class="footer-sdgs">
+      <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#DDA63A"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">2</text></svg>
+      <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#26BDE2"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">6</text></svg>
+      <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#BF8B2E"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">12</text></svg>
+      <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#3F7E44"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">13</text></svg>
+      <svg class="sdg-ico" viewbox="0 0 100 100"><rect width="100" height="100" fill="#56C02B"></rect><text x="50" y="40" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">15</text></svg>
+    </div>
+  </footer>
+</div><!-- /app-wrap -->
+
+<script>
+// ── SCORING ENGINE (mirrors scoring.py exactly) ───────────────────
+const WEIGHTS={gender:.20,social:.15,governance:.15,climate:.18,pollution:.10,water:.08,territory:.08,innovation:.06};
+const VETO_THRESHOLD=30;
+
+const COUNTRY={
+  "France":[71,.28,.903,true],"Germany":[78,.25,.942,true],"Netherlands":[79,.30,.941,true],
+  "Spain":[60,.38,.905,true],"Italy":[56,.35,.895,true],"Poland":[54,.32,.880,true],
+  "Romania":[46,.40,.821,true],"Portugal":[62,.36,.866,true],"Sweden":[85,.20,.952,true],
+  "Denmark":[90,.18,.948,true],"Belgium":[73,.27,.937,true],"Austria":[74,.22,.916,true],
+  "Czech Republic":[57,.31,.900,true],"Hungary":[42,.42,.854,true],"Greece":[49,.45,.887,true],
+  "United Kingdom":[71,.26,.929,false],"Switzerland":[82,.19,.962,false],"Norway":[84,.17,.966,false],
+  "Turkey":[34,.50,.838,false],"Ukraine":[33,.45,.773,false],
+  "United States":[69,.33,.926,false],"Canada":[76,.28,.936,false],
+  "Brazil":[36,.55,.760,false],"Mexico":[31,.60,.758,false],"Chile":[66,.50,.860,false],
+  "Colombia":[39,.58,.752,false],"Argentina":[37,.52,.842,false],"Peru":[40,.55,.762,false],
+  "Morocco":[38,.62,.683,false],"Senegal":[43,.72,.511,false],"Kenya":[36,.70,.601,false],
+  "Nigeria":[25,.75,.535,false],"South Africa":[41,.65,.713,false],"Ghana":[43,.68,.632,false],
+  "Ethiopia":[37,.80,.492,false],
+  "India":[39,.58,.633,false],"Bangladesh":[24,.78,.661,false],"Vietnam":[41,.62,.703,false],
+  "Indonesia":[34,.66,.705,false],"Philippines":[33,.70,.699,false],
+  "Japan":[73,.35,.920,false],"South Korea":[63,.30,.929,false],"Australia":[75,.32,.951,false],
+  "Other / Unknown":[45,.50,.700,false]
+};
+
+const SECTOR={
+  "Renewable Energy":[true,.05],"Energy Efficiency":[true,.10],"Water & Sanitation":[true,.08],
+  "Clean Transportation":[true,.15],"Green Building / Real Estate":[true,.20],
+  "Circular Economy":[true,.18],"Biodiversity / Nature":[true,.05],
+  "Sustainable Agriculture":[true,.35],"Social Infrastructure":[true,.10],
+  "Healthcare":[false,.22],"Education & Skills":[false,.12],"Financial Inclusion":[false,.10],
+  "Microfinance":[false,.15],"Affordable Housing":[false,.28],"Digital Infrastructure":[false,.25],
+  "SME Finance":[false,.30],"Food & Nutrition":[false,.42],
+  "Private Equity (diversified)":[false,.40],"Manufacturing (conventional)":[false,.65],
+  "Extractive Industry":[false,.85],"Other":[false,.40]
+};
+
+const HIGH_SOCIAL=new Set(["Healthcare","Education & Skills","Microfinance","Financial Inclusion","Social Infrastructure","Affordable Housing","Water & Sanitation"]);
+const LOW_SOCIAL =new Set(["Extractive Industry","Manufacturing (conventional)","Private Equity (diversified)"]);
+const INNOV_SECT =new Set(["Renewable Energy","Digital Infrastructure","Clean Transportation","Energy Efficiency","Circular Economy","Education & Skills","Financial Inclusion","Water & Sanitation"]);
+const HIGH_TRANS =new Set(["Extractive Industry","Manufacturing (conventional)","Food & Nutrition","Private Equity (diversified)"]);
+const LOW_TRANS  =new Set(["Renewable Energy","Energy Efficiency","Clean Transportation","Circular Economy","Biodiversity / Nature"]);
+
+function clamp(x,lo=0,hi=100){return Math.max(lo,Math.min(hi,x));}
+function sizeFactor(eur){const lo=Math.log(1500),hi=Math.log(50e6);return clamp((Math.log(Math.max(eur,1500))-lo)/(hi-lo),0,1);}
+function defaultGender(sector){if(HIGH_SOCIAL.has(sector))return.72;if(LOW_SOCIAL.has(sector))return.44;return.58;}
+
+function scoreGender(g,cpi,hdi){const raw=g*55+(cpi/100)*25+hdi*15-(1-cpi/100)*20;return clamp(raw*(100/75));}
+function scoreSocial(sector,hdi,sf){const s=HIGH_SOCIAL.has(sector)?.82:(LOW_SOCIAL.has(sector)?.38:.60);const b=HIGH_SOCIAL.has(sector)?15:0;return clamp(s*50+hdi*25+sf*15+b-(1-hdi)*(1-s)*25);}
+function scoreClimate(ghg,taxElig,vuln,sf){return clamp((1-ghg)*70+(taxElig?20:0)-vuln*15+sf*5);}
+function scoreWater(ghg,vuln){return clamp(70-(ghg>.4?40:ghg*30)-vuln*20);}
+function scoreTerritory(hdi,sf,euMember){return clamp(30+(1-hdi)*40+(euMember?20:10)+sf*10);}
+function scoreGovernance(cpi,euMember,assetCls){let b=(cpi/100)*65+(euMember?20:0);if(["Green Bond","Project Finance"].includes(assetCls))b+=10;return clamp(b);}
+function scorePollution(ghg,taxElig){return clamp((1-ghg)*75+(taxElig?20:0));}
+function scoreInnovation(sector,sf,hdi){return clamp(40+(INNOV_SECT.has(sector)?30:0)+sf*20+hdi*10);}
+
+function computeIDRIS(dims){return Object.keys(WEIGHTS).reduce((s,k)=>s+WEIGHTS[k]*dims[k],0);}
+
+function calcPAI(ghg,gender,cpi,vuln,gov){
+  const s=[(1-ghg)*100,(1-ghg*.8)*100,(1-vuln*.5)*100,(1-ghg*.4)*100,(1-ghg*.6)*100,
+            gender*100,gender*90,(cpi/100)*100,(cpi/100)*85,gov];
+  return Math.round(s.reduce((a,b)=>a+b,0)/s.length*10)/10;
+}
+
+function calcSFDR(idris,taxAligned,pai,gov){
+  if(taxAligned&&idris>=72&&pai>=70)return"Article 9";
+  if(idris>=50&&pai>=50)return"Article 8";
+  return"Article 6";
+}
+
+function calcTCFD(vuln,ghg,sector){
+  const phys=vuln>.65?"High":(vuln>.40?"Medium":"Low");
+  const trans=HIGH_TRANS.has(sector)?"High":(LOW_TRANS.has(sector)?"Low":"Medium");
+  return[phys,trans];
+}
+
+function calcMiFID(idris,sfdr,phys,trans){
+  let b=idris/10;
+  if(sfdr==="Article 9")b=Math.min(b+1.5,10);
+  else if(sfdr==="Article 8")b=Math.min(b+.5,10);
+  if(phys==="High"||trans==="High")b=Math.max(b-1,0);
+  b=Math.round(b*10)/10;
+  let p=b>=7.5?"Sustainability-focused (MiFID Art. 9 preference)":(b>=5?"ESG-integrated (MiFID Art. 8 preference)":"Conventional (Article 6 compatible)");
+  return[b,p];
+}
+
+function calcTaxonomy(sector,ghg,vuln,idris){
+  const[elig]=SECTOR[sector]||[false];
+  if(!elig)return[false,false,false,0];
+  const sc=clamp((1-ghg)*.6+(idris/100)*.4,0,1);
+  const dnsh=(ghg<.50)&&(vuln<.70);
+  const aligned=dnsh&&(sc>.40);
+  return[true,aligned,dnsh,Math.round(sc*100*10)/10];
+}
+
+// ── MAIN CALCULATE FUNCTION ──────────────────────────────────────
+let lastResult = null;
+
+function calculate(){
+  const country  = document.getElementById('country').value;
+  const sector   = document.getElementById('sector').value;
+  const ac       = document.getElementById('assetClass').value;
+  const eur      = parseFloat(document.getElementById('investmentEur').value)||2e6;
+  const ghgOv    = parseFloat(document.getElementById('ghg').value);
+  const genderOv = parseFloat(document.getElementById('genderF').value);
+  const govSlider= parseFloat(document.getElementById('govOverride').value);
+  const projName = document.getElementById('projectName').value||'Project';
+
+  const[cpi,vuln,hdi,euMember]=COUNTRY[country]||[45,.5,.7,false];
+  const[taxElig,ghgBase]=SECTOR[sector]||[false,.4];
+  const ghg   = ghgOv;
+  const gf    = genderOv;
+  const sf    = sizeFactor(eur);
+
+  const govScore = (govSlider>0) ? govSlider : scoreGovernance(cpi,euMember,ac);
+
+  const dims={
+    gender:     scoreGender(gf,cpi,hdi),
+    social:     scoreSocial(sector,hdi,sf),
+    governance: govScore,
+    climate:    scoreClimate(ghg,taxElig,vuln,sf),
+    pollution:  scorePollution(ghg,taxElig),
+    water:      scoreWater(ghg,vuln),
+    territory:  scoreTerritory(hdi,sf,euMember),
+    innovation: scoreInnovation(sector,sf,hdi),
+  };
+
+  const rawIDRIS = computeIDRIS(dims);
+  const vetoTriggered = dims.gender<VETO_THRESHOLD||dims.social<VETO_THRESHOLD;
+  let bandStr;
+  if(rawIDRIS>=75)bandStr="Dark Green";
+  else if(rawIDRIS>=58)bandStr="Green";
+  else if(rawIDRIS>=40)bandStr="Amber";
+  else bandStr="Red";
+  if(vetoTriggered&&(bandStr==="Dark Green"||bandStr==="Green"))bandStr="Amber";
+
+  const[taxE,taxA,dnsh,sc]=calcTaxonomy(sector,ghg,vuln,rawIDRIS);
+  const pai=calcPAI(ghg,gf,cpi,vuln,dims.governance);
+  const sfdr=calcSFDR(rawIDRIS,taxA,pai,dims.governance);
+  const[phys,trans]=calcTCFD(vuln,ghg,sector);
+  const[ms,mp]=calcMiFID(rawIDRIS,sfdr,phys,trans);
+
+  lastResult={
+    projName,country,sector,ac,eur,
+    idris:Math.round(rawIDRIS*10)/10,band:bandStr,dims,
+    veto:vetoTriggered,pai,sfdr,
+    taxElig:taxE,taxAlign:taxA,dnsh,sc,
+    phys,trans,ms,mp,
+    euMember,ghg,gf,hdi,cpi,vuln,sf
+  };
+
+  renderResults(lastResult);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+const BAND_COLORS={"Dark Green":"#1a6b3a","Green":"#33AA66","Amber":"#E8A020","Red":"#CC3333"};
+const DIM_ORDER=["gender","social","governance","climate","pollution","water","territory","innovation"];
+const DIM_LABELS={"gender":"Gender Equity","social":"Social Mobility","governance":"Governance","climate":"Climate","pollution":"Pollution","water":"Water","territory":"Territory","innovation":"Innovation"};
+const DIM_COLORS={"gender":"#FF33FF","social":"#CC00CC","governance":"#33FFA2","climate":"#33AA66","pollution":"#00CC7A","water":"#26BDE2","territory":"#DDA63A","innovation":"#9B59B6"};
+
+function renderResults(r){
+  // Score hero
+  const sn=document.getElementById('scoreNumber');
+  sn.textContent=r.idris.toFixed(1);
+  sn.style.color=BAND_COLORS[r.band];
+  const bp=document.getElementById('bandPill');
+  bp.textContent=r.band;
+  bp.className='band-pill-lg band-'+r.band.toLowerCase().replace(' ','-').replace('dark-green','dg').replace('green','g').replace('amber','a').replace('red','r');
+  // Veto
+  const vb=document.getElementById('vetoBanner');
+  if(r.veto){
+    vb.style.display='block';
+    let msg='';
+    if(r.dims.gender<VETO_THRESHOLD)msg+=`Gender equity score (${r.dims.gender.toFixed(0)}/100) is below the ${VETO_THRESHOLD}-point floor. `;
+    if(r.dims.social<VETO_THRESHOLD)msg+=`Social mobility score (${r.dims.social.toFixed(0)}/100) is below the ${VETO_THRESHOLD}-point floor. `;
+    msg+='Band capped at Amber — social foundation failure is disqualifying under IDRIS methodology.';
+    document.getElementById('vetoText').textContent=msg;
+  } else {
+    vb.style.display='none';
+  }
+  // SFDR
+  const sfdrEl=document.getElementById('sfdrRec');
+  sfdrEl.className='sfdr-rec '+({'Article 9':'art9','Article 8':'art8','Article 6':'art6'}[r.sfdr]);
+  document.getElementById('sfdrName').textContent=r.sfdr;
+  const sfdrDescs={'Article 9':'Sustainable investment objective. Full EU Taxonomy alignment and comprehensive PAI disclosure required.',
+    'Article 8':'Promotes environmental or social characteristics. Binding E/S elements must be documented in investment strategy.',
+    'Article 6':'No specific sustainability claims. Sustainability risk integration disclosure required.'};
+  document.getElementById('sfdrDesc').textContent=sfdrDescs[r.sfdr];
+  document.getElementById('mifidScore').textContent=r.ms.toFixed(1);
+  document.getElementById('mifidProfile').textContent=r.mp;
+
+  // Radar
+  drawRadar(r.dims);
+
+  // Dimension bars
+  const bars=document.getElementById('dimBars');
+  bars.innerHTML='';
+  DIM_ORDER.forEach(k=>{
+    const v=r.dims[k];
+    const color=v<30?'#CC3333':(v<50?'#E8A020':DIM_COLORS[k]);
+    bars.innerHTML+=`<div class="dim-row">
+      <span class="dim-name">${DIM_LABELS[k]}</span>
+      <div class="dim-track"><div class="dim-fill" style="width:${v}%;background:${color}"></div></div>
+      <span class="dim-val">${v.toFixed(0)}</span>
+    </div>`;
+  });
+
+  // Regulatory grid
+  const rg=document.getElementById('regGrid');
+  const tcfdClass=t=>t==='Low'?'tcfd-low':(t==='High'?'tcfd-high':'tcfd-med');
+  rg.innerHTML=`
+    <div class="reg-item">
+      <div class="reg-label">EU Taxonomy</div>
+      <div class="reg-value ${r.taxElig?(r.taxAlign?'status-pass':'status-med'):''}">
+        ${r.taxElig?(r.taxAlign?'Aligned':'Eligible, not aligned'):'Not eligible'}
+      </div>
+      <div class="reg-sub">DNSH: <span class="${r.dnsh?'status-pass':'status-fail'}">${r.dnsh?'Pass':'Fail'}</span> &middot; SC: ${r.sc}%</div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-label">SFDR Classification</div>
+      <div class="reg-value">${r.sfdr}</div>
+      <div class="reg-sub">PAI Score: ${r.pai}/100</div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-label">TCFD Risk</div>
+      <div class="reg-sub">
+        <div class="tcfd-row">
+          <span class="tcfd-pill ${tcfdClass(r.phys)}">Physical: ${r.phys}</span>
+          <span class="tcfd-pill ${tcfdClass(r.trans)}">Transition: ${r.trans}</span>
+        </div>
+      </div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-label">CSRD / ESRS</div>
+      <div class="reg-value ${r.euMember&&r.eur>5e6?'status-med':''}">
+        ${r.euMember&&r.eur>5e6?'Likely in scope':'Out of scope'}
+      </div>
+      <div class="reg-sub">EU member: ${r.euMember?'Yes':'No'} &middot; Size: &euro;${(r.eur/1e6).toFixed(1)}M</div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-label">PRIIPs / MiFID II</div>
+      <div class="reg-value">${r.ms.toFixed(1)}/10</div>
+      <div class="reg-sub">${r.mp.split('(')[0].trim()}</div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-label">Social Veto Rule</div>
+      <div class="reg-value ${r.veto?'status-fail':'status-pass'}">${r.veto?'Triggered':'Clear'}</div>
+      <div class="reg-sub">Gender: ${r.dims.gender.toFixed(0)}/100 &middot; Social: ${r.dims.social.toFixed(0)}/100</div>
+    </div>`;
+
+  // PAI grid
+  const paiItems=[
+    ['PAI 1','GHG emissions',r.dims.climate],['PAI 2','Carbon footprint',r.dims.climate],
+    ['PAI 4','Fossil fuel exposure',r.dims.pollution],['PAI 7','Biodiversity',r.dims.climate],
+    ['PAI 8','Water emissions',r.dims.water],['PAI 9','Hazardous waste',r.dims.pollution],
+    ['PAI 10','UNGC violations',r.dims.governance],['PAI 12','Gender pay gap',r.dims.gender],
+    ['PAI 13','Board diversity',r.dims.gender],['PAI 16','Corruption exposure',r.dims.governance],
+  ];
+  document.getElementById('paiScoreVal').textContent=r.pai.toFixed(1);
+  const pg=document.getElementById('paiGrid');
+  pg.innerHTML=paiItems.map(([code,label,score])=>{
+    const cls=score>=60?'pai-dot-g':(score>=40?'pai-dot-a':'pai-dot-r');
+    return`<div class="pai-item"><div class="pai-dot ${cls}"></div><span class="pai-text">${code} ${label}</span><span class="pai-score-val">${score.toFixed(0)}</span></div>`;
+  }).join('');
+
+  // Warnings + strengths
+  const warns=buildWarnings(r);
+  const strengths=buildStrengths(r);
+  document.getElementById('warnCol').innerHTML=warns.length?warns.map(w=>`<div class="flag-item flag-warn">${w}</div>`).join(''):'<div class="flag-item flag-warn" style="opacity:.5">No critical warnings identified.</div>';
+  document.getElementById('strengthCol').innerHTML=strengths.length?strengths.map(s=>`<div class="flag-item flag-strength">${s}</div>`).join(''):'<div class="flag-item flag-strength" style="opacity:.5">No particular strengths identified.</div>';
+
+  // Show results
+  const wrap=document.getElementById('resultsWrap');
+  wrap.classList.remove('results-hidden');
+  wrap.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildWarnings(r){
+  const w=[];
+  if(r.dims.gender<VETO_THRESHOLD)w.push(`<strong>SOCIAL VETO:</strong> Gender equity (${r.dims.gender.toFixed(0)}/100) below 30-point floor — band capped at Amber.`);
+  if(r.dims.social<VETO_THRESHOLD) w.push(`<strong>SOCIAL VETO:</strong> Social mobility (${r.dims.social.toFixed(0)}/100) below 30-point floor — band capped at Amber.`);
+  if(r.dims.governance<40)w.push('Governance below threshold — high corruption risk in country of operation.');
+  if(r.dims.climate<45)   w.push('Climate score below sector average — review GHG intensity and taxonomy eligibility.');
+  if(r.dims.gender<40)    w.push('Gender equity low — SFDR PAI 12 (gender pay gap) likely adverse.');
+  if(r.dims.pollution<40) w.push('Pollution score indicates significant environmental harm — DNSH risk.');
+  if(r.phys==='High')     w.push('TCFD: High physical climate risk — stranded asset risk under 1.5°C/2°C scenarios.');
+  if(r.trans==='High')    w.push('TCFD: High transition risk — sector faces significant regulatory disruption.');
+  if(!r.euMember)         w.push('Non-EU jurisdiction — additional due diligence required for SFDR/Taxonomy reporting.');
+  if(r.ghg>.60)           w.push('GHG intensity high — likely to fail DNSH climate mitigation criterion.');
+  return w;
+}
+
+function buildStrengths(r){
+  const s=[];
+  if(r.taxAlign)          s.push('<strong>EU Taxonomy aligned</strong> — eligible for Article 9 fund qualification.');
+  if(r.sfdr==='Article 9')s.push('<strong>Article 9 classification</strong> — sustainable investment objective met.');
+  else if(r.sfdr==='Article 8')s.push('<strong>Article 8 classification</strong> — E/S characteristics documented.');
+  if(r.dims.climate>=75)  s.push('Strong climate contribution — significant GHG avoidance or clean energy generation.');
+  if(r.dims.social>=75)   s.push('High social impact — supports employment, skills and local economic development.');
+  if(r.dims.governance>=75)s.push('Strong governance — low corruption exposure and transparent ownership.');
+  if(r.dims.gender>=75)   s.push('Excellent gender equity profile — strong PAI 12 and PAI 13 performance.');
+  return s;
+}
+
+// ── RADAR CANVAS ─────────────────────────────────────────────────
+function drawRadar(dims){
+  const canvas=document.getElementById('radarCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx=W/2,cy=H/2,r=Math.min(W,H)/2-40;
+  ctx.clearRect(0,0,W,H);
+
+  const keys=DIM_ORDER;
+  const N=keys.length;
+  const angle=i=>i*(2*Math.PI/N)-Math.PI/2;
+
+  // Grid rings
+  [25,50,75,100].forEach(pct=>{
+    ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const a=angle(i),d=(pct/100)*r;
+      i===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=pct===50?'rgba(0,0,0,.15)':'rgba(0,0,0,.07)';
+    ctx.lineWidth=pct===50?1.2:.6;
+    ctx.stroke();
+    // Ring label
+    ctx.fillStyle='#aaa';ctx.font='9px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(pct,cx+2,cy-(pct/100)*r-3);
+  });
+
+  // Spokes
+  for(let i=0;i<N;i++){
+    const a=angle(i);
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+    ctx.strokeStyle='rgba(0,0,0,.08)';ctx.lineWidth=.8;ctx.stroke();
+  }
+
+  // Reference ring at 50
+  ctx.beginPath();
+  for(let i=0;i<N;i++){const a=angle(i),d=.5*r;i===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);}
+  ctx.closePath();ctx.strokeStyle='rgba(0,0,0,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+
+  // Data polygon
+  ctx.beginPath();
+  keys.forEach((k,i)=>{const a=angle(i),d=(dims[k]/100)*r;i===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);});
+  ctx.closePath();
+  ctx.fillStyle='rgba(51,255,162,.15)';ctx.fill();
+  ctx.strokeStyle='#33FFA2';ctx.lineWidth=2;ctx.stroke();
+
+  // Magenta overlay for social dims
+  const socialKeys=['gender','social','governance'];
+  ctx.beginPath();
+  socialKeys.forEach((k,idx)=>{
+    const i=keys.indexOf(k),a=angle(i),d=(dims[k]/100)*r;
+    idx===0?ctx.moveTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d):ctx.lineTo(cx+Math.cos(a)*d,cy+Math.sin(a)*d);
+  });
+  ctx.strokeStyle='rgba(255,51,255,.4)';ctx.lineWidth=1.5;ctx.stroke();
+
+  // Data dots + labels
+  keys.forEach((k,i)=>{
+    const a=angle(i),d=(dims[k]/100)*r;
+    const px=cx+Math.cos(a)*d,py=cy+Math.sin(a)*d;
+    ctx.beginPath();ctx.arc(px,py,3.5,0,2*Math.PI);
+    ctx.fillStyle=DIM_COLORS[k];ctx.fill();
+    // Label
+    const lx=cx+Math.cos(a)*(r+22),ly=cy+Math.sin(a)*(r+22);
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 10px Inter,sans-serif';ctx.textAlign='center';
+    ctx.fillText(DIM_LABELS[k].split(' ')[0],lx,ly+4);
+  });
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function updateGovLabel(el){
+  const v=parseFloat(el.value);
+  document.getElementById('govVal').textContent=v<=0?'Auto':v.toFixed(0);
+}
+
+// ── PDF REPORT ────────────────────────────────────────────────────
+async function downloadPDF(){
+  if(!lastResult){return;}
+  const btn=document.getElementById('pdfBtn');
+  btn.disabled=true;btn.textContent='Generating PDF...';
+
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,H=297,M=18,cW=174;
+  let y=0;
+  const r=lastResult;
+
+  const DARK=[26,26,46],MINT=[51,255,162],MAG=[255,51,255],GREY=[115,115,115];
+  const WHITE=[240,237,230],INK=[26,26,26],DG=[26,107,58],GREEN=[51,170,102];
+  const AMBER=[232,160,32],RED=[204,51,51];
+  const BAND_CLR={'Dark Green':DG,'Green':GREEN,'Amber':AMBER,'Red':RED};
+
+  const sf=(s,sz,c)=>{doc.setFont('helvetica',s);doc.setFontSize(sz);if(c)doc.setTextColor(...c);};
+  const rr=(x,y,w,h,r,s)=>doc.roundedRect(x,y,w,h,r,r,s);
+
+  // Load logo
+  let logoData=null;
+  try{const resp=await fetch('assets/logo.png');if(resp.ok){const blob=await resp.blob();logoData=await new Promise(res=>{const rd=new FileReader();rd.onloadend=()=>res(rd.result);rd.readAsDataURL(blob);});}}catch(e){}
+
+  // ── HEADER ──
+  doc.setFillColor(...DARK);doc.rect(0,0,W,48,'F');
+  doc.setFillColor(...MINT);doc.rect(0,48,W,2,'F');
+  if(logoData){try{doc.addImage(logoData,'PNG',M,10,24,24);}catch(e){}}
+  else{doc.setFillColor(...MINT);doc.circle(M+5,24,5,'F');}
+  sf('bold',20,WHITE);doc.text('IDRIS',logoData?M+30:M+14,22);
+  sf('normal',9,GREY); doc.text('Impact Due Diligence Risk Intelligence Scoring',logoData?M+30:M+14,30);
+  sf('normal',7,GREY); doc.text('Project: '+r.projName+' | '+r.country+' | '+r.sector,logoData?M+30:M+14,37);
+  sf('normal',7,GREY); doc.text('Generated: '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}),logoData?M+30:M+14,43);
+  sf('bold',8,MINT);   doc.text('Danki Studio',W-M,22,{align:'right'});
+  sf('normal',7,GREY); doc.text('Nambona Adeline YANGUERE',W-M,29,{align:'right'});
+  y=56;
+
+  // ── COMPOSITE SCORE ──
+  sf('bold',9,MINT);doc.text('IDRIS COMPOSITE SCORE',M,y);
+  doc.setFillColor(...MINT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
+  const bc=BAND_CLR[r.band]||GREY;
+  doc.setFillColor(...bc);rr(M,y,cW,28,3,'F');
+  sf('bold',28,WHITE);doc.text(r.idris.toFixed(1),M+10,y+20);
+  sf('normal',9,WHITE);doc.text('/100',M+40,y+20);
+  sf('bold',10,WHITE); doc.text(r.band.toUpperCase(),M+60,y+16);
+  sf('normal',7,WHITE);doc.text('SFDR: '+r.sfdr,M+60,y+22);
+  doc.text('MiFID II: '+r.ms.toFixed(1)+'/10',M+60,y+27);
+  if(r.veto){sf('bold',7,[255,200,0]);doc.text('SOCIAL VETO TRIGGERED',W-M-2,y+8,{align:'right'});}
+  y+=34;
+
+  // ── DIMENSIONS ──
+  sf('bold',9,MINT);doc.text('IMPACT DIMENSIONS',M,y);
+  doc.setFillColor(...MINT);doc.rect(M,y+1.5,30,.5,'F');y+=8;
+  DIM_ORDER.forEach((k,i)=>{
+    const ry=y+i*8,val=r.dims[k],bw=(cW-60)*(val/100);
+    const c=val<30?RED:(val<50?AMBER:(k==='gender'||k==='social'||k==='governance'?[180,80,200]:[51,180,100]));
+    sf('normal',7,GREY);doc.text(DIM_LABELS[k],M,ry+3);
+    doc.setFillColor(220,220,220);rr(M+55,ry,cW-60,5,1,'F');
+    doc.setFillColor(...c);rr(M+55,ry,bw,5,1,'F');
+    sf('bold',7,INK);doc.text(val.toFixed(0),M+cW-3,ry+3.5,{align:'right'});
+  });
+  y+=DIM_ORDER.length*8+6;
+
+  // ── REGULATORY ──
+  sf('bold',9,MINT);doc.text('REGULATORY FRAMEWORK',M,y);
+  doc.setFillColor(...MINT);doc.rect(M,y+1.5,36,.5,'F');y+=8;
+  const regs=[
+    ['EU Taxonomy',r.taxElig?(r.taxAlign?'Aligned':'Not aligned'):'Not eligible',r.taxElig&&r.taxAlign?DG:GREY],
+    ['SFDR',r.sfdr,r.sfdr==='Article 9'?DG:(r.sfdr==='Article 8'?GREEN:GREY)],
+    ['TCFD Physical',r.phys,r.phys==='Low'?DG:(r.phys==='High'?RED:AMBER)],
+    ['TCFD Transition',r.trans,r.trans==='Low'?DG:(r.trans==='High'?RED:AMBER)],
+    ['CSRD in scope',r.euMember&&r.eur>5e6?'Likely':'No',GREY],
+    ['Social Veto',r.veto?'TRIGGERED':'Clear',r.veto?RED:DG],
+  ];
+  const rw=(cW-4)/3;
+  regs.forEach(([label,val,color],i)=>{
+    const rx=M+(i%3)*(rw+2),ry=y+Math.floor(i/3)*18;
+    doc.setFillColor(240,240,238);rr(rx,ry,rw,15,2,'F');
+    sf('normal',6,GREY);doc.text(label,rx+3,ry+5.5);
+    sf('bold',8,color);doc.text(val,rx+3,ry+12);
+  });
+  y+=40;
+
+  // ── FLAGS ──
+  const warns=buildWarnings(r).map(w=>w.replace(/<[^>]+>/g,''));
+  const strengths=buildStrengths(r).map(s=>s.replace(/<[^>]+>/g,''));
+  if(warns.length){
+    sf('bold',9,AMBER);doc.text('WARNINGS',M,y);
+    doc.setFillColor(...AMBER);doc.rect(M,y+1.5,18,.5,'F');y+=7;
+    warns.forEach(w=>{
+      doc.setFillColor(255,248,230);rr(M,y,cW,8,1,'F');
+      sf('normal',6.5,INK);
+      const lines=doc.splitTextToSize(w,cW-6);
+      doc.text(lines[0],M+3,y+5);y+=10;
+    });
+    y+=2;
+  }
+  if(strengths.length){
+    if(y>H-60){doc.addPage();doc.setFillColor(247,247,245);doc.rect(0,0,W,H,'F');y=M;}
+    sf('bold',9,DG);doc.text('STRENGTHS',M,y);
+    doc.setFillColor(...DG);doc.rect(M,y+1.5,20,.5,'F');y+=7;
+    strengths.forEach(s=>{
+      doc.setFillColor(230,248,237);rr(M,y,cW,8,1,'F');
+      sf('normal',6.5,INK);doc.text(s.substring(0,90),M+3,y+5);y+=10;
+    });
+  }
+
+  // ── SCREENSHOT ──
+  try{
+    const canvas=await html2canvas(document.getElementById('scoreCard'),{scale:1.3,backgroundColor:'#FFFFFF',useCORS:true,logging:false});
+    const img=canvas.toDataURL('image/jpeg',.8);
+    const ih=(canvas.height/canvas.width)*cW;
+    if(y+ih+20>H-15){doc.addPage();doc.setFillColor(247,247,245);doc.rect(0,0,W,H,'F');y=M;}
+    sf('bold',9,MINT);doc.text('SCORE CARD SNAPSHOT',M,y);y+=6;
+    doc.addImage(img,'JPEG',M,y,cW,ih);y+=ih+5;
+  }catch(e){console.warn('Screenshot skipped:',e);}
+
+  // ── FOOTER ──
+  const np=doc.getNumberOfPages();
+  for(let p=1;p<=np;p++){
+    doc.setPage(p);
+    doc.setFillColor(...DARK);doc.rect(0,H-12,W,12,'F');
+    doc.setFillColor(...MINT); doc.rect(0,H-12,W,1,'F');
+    sf('normal',6,GREY);
+    doc.text('IDRIS v1.0 — Impact & Due Diligence Risk Intelligence Scoring — Danki Studio',M,H-5);
+    doc.text('Page '+p+'/'+np,W-M,H-5,{align:'right'});
+    sf('normal',5.5,[70,70,70]);
+    doc.text('Composite index — not a substitute for full investment due diligence. For professional use only.',M,H-2);
+  }
+
+  const fname='IDRIS-'+r.projName.replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.pdf';
+  doc.save(fname);
+  btn.disabled=false;
+  btn.innerHTML='&#8595; Download Due Diligence Report (PDF)';
+}
+</script>
+
+
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

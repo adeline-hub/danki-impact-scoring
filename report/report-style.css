@@ -1,0 +1,246 @@
+/* ── IDRIS Report Stylesheet ─────────────────────────────────
+   Brand: #33FFA2 mint · #FF33FF magenta · #737373 grey
+   Typography: Fraunces (display) + DM Mono (data) + Inter (body)
+   ──────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --mint:    #33FFA2;
+  --magenta: #FF33FF;
+  --grey:    #737373;
+  --bg:      #F7F7F5;
+  --surface: #FFFFFF;
+  --border:  #E5E5E5;
+  --ink:     #1A1A1A;
+  --ink-2:   #3D3D3D;
+  --ink-3:   #737373;
+  --dg:      #1a6b3a;
+  --green:   #33AA66;
+  --amber:   #E8A020;
+  --red:     #CC3333;
+}
+
+body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
+
+/* ── REPORT HEADER ─────────────────────────────────────────── */
+.report-header {
+  background: var(--ink);
+  color: white;
+  margin: -2rem -2rem 3rem -2rem;
+  padding: 4rem 3rem;
+}
+.report-header-inner { max-width: 820px; margin: 0 auto; }
+.report-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: .7rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--grey); margin-bottom: 1.5rem;
+}
+.report-title {
+  font-family: 'Fraunces', serif; font-size: 5rem;
+  font-weight: 700; line-height: 1; letter-spacing: -.03em;
+  background: linear-gradient(135deg, var(--mint), var(--magenta));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: .5rem;
+}
+.report-subtitle {
+  font-family: 'Fraunces', serif; font-size: 1.5rem;
+  font-weight: 300; color: #ccc; margin-bottom: 1.5rem;
+}
+.report-lead {
+  font-size: .95rem; color: #aaa; line-height: 1.8;
+  max-width: 680px; margin-bottom: 2rem;
+}
+.report-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.badge {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: .28rem .7rem; border-radius: 4px; font-weight: 500;
+}
+.badge-green  { background: rgba(51,255,162,.15); color: var(--mint);    border: 1px solid rgba(51,255,162,.3); }
+.badge-blue   { background: rgba(58,180,242,.15);  color: #3ab4f2;       border: 1px solid rgba(58,180,242,.3); }
+.badge-teal   { background: rgba(0,200,180,.15);   color: #00c8b4;       border: 1px solid rgba(0,200,180,.3); }
+.badge-orange { background: rgba(245,166,35,.15);  color: #f5a623;       border: 1px solid rgba(245,166,35,.3); }
+.badge-purple { background: rgba(180,100,255,.15); color: #b464ff;       border: 1px solid rgba(180,100,255,.3); }
+.badge-mint   { background: rgba(51,255,162,.12);  color: #009955;       border: 1px solid rgba(51,255,162,.4); }
+.badge-grey   { background: rgba(115,115,115,.12); color: var(--grey);   border: 1px solid rgba(115,115,115,.3); }
+
+/* SDG tiles in header */
+.sdg-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-top: .5rem; }
+.sdg-label { font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em; color: var(--grey); text-transform: uppercase; }
+.sdg-tile { width: 40px; height: 40px; border-radius: 4px; }
+.sdg-tile-sm { width: 26px; height: 26px; border-radius: 3px; }
+
+/* ── HEADINGS ──────────────────────────────────────────────── */
+h1, h2, h3 { font-family: 'Fraunces', serif; }
+h2 { font-size: 1.7rem; font-weight: 600; color: var(--ink); border-bottom: 2px solid var(--mint); padding-bottom: .5rem; margin-top: 3rem; }
+h3 { font-size: 1.15rem; font-weight: 600; color: var(--ink-2); margin-top: 2rem; }
+p  { line-height: 1.8; color: var(--ink-2); margin-bottom: 1rem; }
+
+/* ── ARCHITECTURE DIAGRAM ─────────────────────────────────── */
+.architecture-diagram {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2rem; margin: 2rem 0;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+}
+.arch-layer {
+  width: 100%; max-width: 700px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1rem 1.2rem;
+}
+.arch-input     { border-left: 3px solid var(--grey); }
+.arch-context   { border-left: 3px solid #3ab4f2; }
+.arch-dimensions{ border-left: 3px solid var(--mint); }
+.arch-veto      { border-left: 3px solid var(--magenta); flex: 1; }
+.arch-composite { border-left: 3px solid var(--mint); flex: 1; }
+.arch-regulatory{ border-left: 3px solid #f5a623; }
+.arch-row-two { display: flex; gap: 1rem; width: 100%; max-width: 700px; }
+.arch-layer-label {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--grey); margin-bottom: .6rem;
+}
+.arch-note { font-size: .78rem; color: var(--ink-2); line-height: 1.6; margin: 0; }
+.arch-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.arch-arrow { font-size: 1.2rem; color: var(--grey); }
+.chip {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  padding: .2rem .55rem; border-radius: 100px;
+  background: rgba(0,0,0,.04); border: 1px solid var(--border);
+  color: var(--ink-2);
+}
+.chip-mint   { background: rgba(51,255,162,.1);  border-color: rgba(51,255,162,.4);  color: #009955; }
+.chip-green  { background: rgba(51,180,80,.1);   border-color: rgba(51,180,80,.4);   color: #1a6b3a; }
+.chip-blue   { background: rgba(58,180,242,.1);  border-color: rgba(58,180,242,.4);  color: #1a70b0; }
+.chip-orange { background: rgba(245,166,35,.1);  border-color: rgba(245,166,35,.4);  color: #8a5500; }
+.chip-grey   { background: rgba(115,115,115,.1); border-color: rgba(115,115,115,.3); color: var(--grey); }
+
+/* ── WEIGHT TABLE ──────────────────────────────────────────── */
+.weight-table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+.weight-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.weight-table th {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: var(--ink); color: white;
+  padding: .65rem 1rem; text-align: left;
+}
+.weight-table td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); }
+.weight-table .row-social { background: rgba(51,255,162,.04); }
+.weight-table .total-row { background: var(--ink); color: white; font-family: 'DM Mono', monospace; font-size: .82rem; }
+.weight-table .total-row td { border: none; }
+
+/* ── MATH FORMULAS ─────────────────────────────────────────── */
+.math-block {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--mint); border-radius: 8px;
+  padding: 1.2rem 1.5rem; margin: 1rem 0;
+  font-family: 'DM Mono', monospace; font-size: .9rem;
+  color: var(--ink);
+}
+
+/* ── SFDR LOGIC BOX ────────────────────────────────────────── */
+.sfdr-logic-box { display: flex; flex-direction: column; gap: .75rem; margin: 1.5rem 0; }
+.sfdr-article {
+  border-radius: 8px; padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+}
+.sfdr-9  { background: rgba(26,107,58,.06);  border-left: 4px solid var(--dg); }
+.sfdr-8  { background: rgba(51,170,102,.06); border-left: 4px solid var(--green); }
+.sfdr-6  { background: rgba(115,115,115,.06);border-left: 4px solid var(--grey); }
+.sfdr-art-label {
+  font-family: 'DM Mono', monospace; font-size: .68rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--grey); margin-bottom: .35rem;
+}
+.sfdr-art-conditions {
+  font-family: 'DM Mono', monospace; font-size: .88rem;
+  color: var(--ink); margin-bottom: .35rem;
+}
+.sfdr-art-desc { font-size: .82rem; color: var(--ink-3); line-height: 1.6; margin: 0; }
+
+/* ── BAND TABLE ────────────────────────────────────────────── */
+.band-table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+.band-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.band-table th {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: var(--ink); color: white; padding: .65rem 1rem;
+}
+.band-table td { padding: .9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.band-dg { background: rgba(26,107,58,.04); }
+.band-g  { background: rgba(51,170,102,.04); }
+.band-a  { background: rgba(232,160,32,.04); }
+.band-r  { background: rgba(204,51,51,.04); }
+.band-pill {
+  display: inline-block; padding: .25rem .75rem;
+  border-radius: 100px; font-family: 'DM Mono', monospace;
+  font-size: .68rem; letter-spacing: .08em; font-weight: 500;
+}
+.band-dg-pill { background: var(--dg);   color: white; }
+.band-g-pill  { background: var(--green);color: white; }
+.band-a-pill  { background: var(--amber);color: white; }
+.band-r-pill  { background: var(--red);  color: white; }
+
+/* ── SECTOR TABLE ──────────────────────────────────────────── */
+.sector-table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+.sector-table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.sector-table th {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: var(--ink); color: white; padding: .6rem .9rem;
+}
+.sector-table td { padding: .55rem .9rem; border-bottom: 1px solid var(--border); }
+.sector-table tr:hover { background: rgba(51,255,162,.03); }
+.yes     { color: var(--dg);   font-weight: 600; }
+.no      { color: var(--grey); }
+.low     { color: var(--dg);   }
+.med     { color: var(--amber);}
+.high-t  { color: var(--red);  font-weight: 600; }
+.high    { color: var(--dg);   }
+.mid     { color: var(--ink-3);}
+.low-t   { color: var(--red);  }
+
+/* ── TABLES (Quarto default) ───────────────────────────────── */
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: .87rem; }
+thead tr { background: var(--ink); color: white; }
+thead th { padding: .65rem 1rem; text-align: left; font-family: 'DM Mono', monospace; font-size: .63rem; letter-spacing: .1em; text-transform: uppercase; }
+tbody td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); }
+tbody tr:hover { background: rgba(51,255,162,.03); }
+
+/* ── BLOCKQUOTE ────────────────────────────────────────────── */
+blockquote {
+  border-left: 3px solid var(--mint); padding: .8rem 1.2rem;
+  background: rgba(51,255,162,.04); border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0; color: var(--ink-2);
+}
+
+/* ── REPORT FOOTER ─────────────────────────────────────────── */
+.report-footer {
+  background: var(--ink); color: white;
+  margin: 4rem -2rem -2rem -2rem; padding: 2.5rem 3rem;
+}
+.report-footer-inner { max-width: 820px; margin: 0 auto; }
+.footer-brand {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1rem;
+}
+.footer-logo {
+  font-family: 'Fraunces', serif; font-size: 1.1rem;
+  font-weight: 600; color: var(--mint);
+}
+.footer-author {
+  font-family: 'DM Mono', monospace; font-size: .72rem;
+  color: var(--grey); letter-spacing: .08em;
+}
+.footer-sdgs { display: flex; gap: .4rem; margin-bottom: 1rem; }
+.footer-disclaimer {
+  font-size: .75rem; color: #666; line-height: 1.7;
+  border-top: 1px solid #333; padding-top: 1rem; margin-top: 1rem;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .report-title { font-size: 3.5rem; }
+  .arch-row-two { flex-direction: column; }
+  .report-header, .report-footer { margin-left: -1rem; margin-right: -1rem; padding-left: 1.5rem; padding-right: 1.5rem; }
+}
